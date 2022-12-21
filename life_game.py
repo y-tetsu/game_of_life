@@ -1,4 +1,7 @@
 import os
+import time
+from platform import system
+from ctypes import windll
 from random import randint
 
 
@@ -20,10 +23,15 @@ class LifeGame:
             (-1,  1), (0,  1), (1,  1),
         ]
         self.count = 1
+        if 'win' in system().lower():
+            kernel = windll.kernel32
+            kernel.SetConsoleMode(kernel.GetStdHandle(-11), 7)
+        os.system('cls')
 
     def show(self):
         ret = []
-        os.system('cls')
+        if self.count != 1:
+            print(f'\033[{self.y+4}A', end='')
         print(f'{self.title} ({self.x} x {self.y})')
         print('┌' + '─' * (self.x * 2) + '┐')
         for y in range(self.y):
@@ -54,6 +62,7 @@ class LifeGame:
     def start(self):
         for _ in range(self.step):
             self.show()
+            time.sleep(0.08)
             self.update()
 
 
