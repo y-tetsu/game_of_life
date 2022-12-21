@@ -60,10 +60,14 @@ class LifeGame:
         self.count += 1
 
     def start(self):
-        for _ in range(self.step):
-            self.show()
-            time.sleep(0.08)
-            self.update()
+        try:
+            print('\033[?25l', end='')
+            for _ in range(self.step):
+                self.show()
+                time.sleep(0.08)
+                self.update()
+        finally:
+            print('\033[?25h', end='')
 
 
 if __name__ == '__main__':
