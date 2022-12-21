@@ -23,9 +23,6 @@ class LifeGame:
             (-1,  1), (0,  1), (1,  1),
         ]
         self.count = 1
-        if 'win' in system().lower():
-            kernel = windll.kernel32
-            kernel.SetConsoleMode(kernel.GetStdHandle(-11), 7)
 
     def show(self):
         ret = []
@@ -60,6 +57,8 @@ class LifeGame:
 
     def start(self):
         try:
+            if 'win' in system().lower():
+                self.enable_sequence()
             self.cls()
             print('\033[?25l', end='')
             for _ in range(self.step):
@@ -68,6 +67,10 @@ class LifeGame:
                 self.update()
         finally:
             print('\033[?25h', end='')
+
+    def enable_sequence(self):
+        kernel = windll.kernel32
+        kernel.SetConsoleMode(kernel.GetStdHandle(-11), 7)
 
     def cls(self):
         os.system('cls')
