@@ -26,7 +26,6 @@ class LifeGame:
         if 'win' in system().lower():
             kernel = windll.kernel32
             kernel.SetConsoleMode(kernel.GetStdHandle(-11), 7)
-        os.system('cls')
 
     def show(self):
         ret = []
@@ -61,6 +60,7 @@ class LifeGame:
 
     def start(self):
         try:
+            self.cls()
             print('\033[?25l', end='')
             for _ in range(self.step):
                 self.show()
@@ -68,6 +68,9 @@ class LifeGame:
                 self.update()
         finally:
             print('\033[?25h', end='')
+
+    def cls(self):
+        os.system('cls')
 
 
 if __name__ == '__main__':
