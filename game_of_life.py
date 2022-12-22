@@ -8,12 +8,35 @@ from random import randint
 DEAD = 0
 ALIVE = 1
 
+SAMPLES = {
+    'glider': {
+        'world': [
+            [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        ],
+        'max_step': 40,
+    },
+}
+
 
 class GameOfLife:
     def __init__(self, title='game_of_life', x=30, y=15, world=None,
                  max_step=100, wait_time=0.05, life='■'):
         self.x = x
         self.y = y
+        if title in SAMPLES:
+            world = SAMPLES[title]['world']
+            max_step = SAMPLES[title]['max_step']
         if world is not None:
             self.x = len(world[0])
             self.y = len(world)
@@ -120,19 +143,9 @@ class Console:
 
 
 if __name__ == '__main__':
-    # world = [
-    #     [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    #     [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    #     [0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    #     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    #     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    #     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    #     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    #     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    #     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    #     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    #     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    #     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    # ]
-    # GameOfLife(world=world, title='グライダー', step=43).start()
-    GameOfLife().start()
+    import sys
+    argv = sys.argv
+    if len(argv) == 2 and argv[1] in SAMPLES:
+        GameOfLife(title=argv[1]).start()
+    else:
+        GameOfLife().start()
