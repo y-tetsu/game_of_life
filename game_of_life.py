@@ -147,5 +147,7 @@ if __name__ == '__main__':
     argv = sys.argv
     if len(argv) == 2 and argv[1] in SAMPLES:
         GameOfLife(title=argv[1]).start()
+    elif len(argv) == 3 and int(argv[1]) > 0 and int(argv[2]) > 0:
+        GameOfLife(x=int(argv[1]), y=int(argv[2])).start()
     else:
         GameOfLife().start()
