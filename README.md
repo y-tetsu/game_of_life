@@ -1,2 +1,2 @@
-# life_game
+# game_of_life
 ライフゲーム
