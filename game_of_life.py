@@ -5,9 +5,6 @@ from ctypes import windll
 from random import randint
 
 
-DEAD = 0
-ALIVE = 1
-
 SAMPLES = {
     'glider': {
         'world': [
@@ -93,12 +90,12 @@ class GameOfLife:
                 for dx, dy in self.dirs:
                     next_x, next_y = x + dx, y + dy
                     if (0 <= next_x < self.x) and (0 <= next_y < self.y):
-                        if self.world[next_y][next_x] == ALIVE:
+                        if self.world[next_y][next_x]:
                             alive += 1
                 if cell:
-                    next_cell = ALIVE if alive == 2 or alive == 3 else DEAD
+                    next_cell = 1 if alive == 2 or alive == 3 else 0
                 else:
-                    next_cell = ALIVE if alive == 3 else DEAD
+                    next_cell = 1 if alive == 3 else 0
                 next_state[y][x] = next_cell
         self.world = [[x for x in row] for row in next_state]
         self.step += 1
