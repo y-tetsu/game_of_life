@@ -3,6 +3,9 @@ import time
 from platform import system
 from ctypes import windll
 from random import random
+from datetime import datetime
+import json
+import pprint
 
 
 SAMPLES = {
@@ -52,6 +55,7 @@ class GameOfLife:
                  loop=False, torus=False):
         self.x = x
         self.y = y
+        rand = False
         if title in SAMPLES:
             if 'world' in SAMPLES[title]:
                 world = SAMPLES[title]['world']
@@ -62,6 +66,7 @@ class GameOfLife:
             self.y = len(world)
             self.world = [[x for x in row] for row in world]
         else:
+            rand = True
             self.world = [[1 if random() < ratio else 0 for _ in range(x)]
                           for _ in range(y)]
         self.max_step = max_step
@@ -76,6 +81,8 @@ class GameOfLife:
         ]
         self.step = 1
         self.console = Console(self.x, self.y, title, life)
+        if rand:
+            self.dump()
 
     def start(self):
         try:
@@ -117,6 +124,28 @@ class GameOfLife:
 
     def wait(self):
         time.sleep(self.wait_time)
+
+    def dump(self):
+        now = datetime.now().strftime('%Y%m%d%H%M%S')
+        json_file = 'world' + now + '.json'
+        settings = {
+            'title': self.console.title,
+            'x': self.x,
+            'y': self.y,
+            'world': self.world,
+            'step': self.max_step,
+            'wait': self.wait_time,
+            'life': self.console.life,
+            'ratio': self.ratio,
+            'loop': self.loop,
+            'torus': self.torus,
+        }
+        with open(json_file, 'w') as f:
+            output = pprint.pformat(settings, indent=4, width=1000, sort_dicts=False)
+            output = output.replace("'", '"')
+            output = output.replace('True', 'true')
+            output = output.replace('False', 'false')
+            f.write(output)
 
 
 class Console:
