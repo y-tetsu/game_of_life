@@ -52,7 +52,8 @@ SAMPLES = {
 class GameOfLife:
     def __init__(self, title='game_of_life', x=30, y=15, world=None,
                  max_step=100, wait_time=0.05, life='■', ratio=0.5,
-                 loop=False, torus=False):
+                 loop=False, torus=False, json_file=''):
+        self.title = title
         self.x = x
         self.y = y
         rand = False
@@ -71,18 +72,42 @@ class GameOfLife:
                           for _ in range(y)]
         self.max_step = max_step
         self.wait_time = wait_time
+        self.life = life
         self.ratio = ratio
         self.loop = loop
         self.torus = torus
+
+        if json_file is not None:
+            rand = False
+            self.load(json_file)
+
         self.dirs = [
             (-1, -1), (0, -1), (1, -1),
             (-1,  0),          (1,  0),
             (-1,  1), (0,  1), (1,  1),
         ]
         self.step = 1
-        self.console = Console(self.x, self.y, title, life)
+        self.console = Console(self.x, self.y, self.title, self.life)
+
         if rand:
             self.dump()
+
+    def load(self, json_file):
+        try:
+            with open(json_file, 'r') as f:
+                settings = json.load(f)
+                self.title = settings['title']
+                self.x = settings['x']
+                self.y = settings['y']
+                self.world = settings['world']
+                self.max_step = settings['step']
+                self.wait_time = settings['wait']
+                self.life = settings['life']
+                self.ratio = settings['ratio']
+                self.loop = settings['loop']
+                self.torus = settings['torus']
+        except FileNotFoundError:
+            pass
 
     def start(self):
         try:
@@ -141,7 +166,8 @@ class GameOfLife:
             'torus': self.torus,
         }
         with open(json_file, 'w') as f:
-            output = pprint.pformat(settings, indent=4, width=1000, sort_dicts=False)
+            output = pprint.pformat(settings, indent=4,
+                                    width=1000, sort_dicts=False)
             output = output.replace("'", '"')
             output = output.replace('True', 'true')
             output = output.replace('False', 'false')
