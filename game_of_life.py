@@ -49,7 +49,7 @@ SAMPLES = {
 class GameOfLife:
     def __init__(self, title='game_of_life', x=30, y=15, world=None,
                  max_step=100, wait_time=0.05, life='■', ratio=0.5,
-                 loop=False):
+                 loop=False, torus=False):
         self.x = x
         self.y = y
         if title in SAMPLES:
@@ -68,6 +68,7 @@ class GameOfLife:
         self.wait_time = wait_time
         self.ratio = ratio
         self.loop = loop
+        self.torus = torus
         self.dirs = [
             (-1, -1), (0, -1), (1, -1),
             (-1,  0),          (1,  0),
@@ -106,6 +107,9 @@ class GameOfLife:
         alive = 0
         for dx, dy in self.dirs:
             next_x, next_y = x + dx, y + dy
+            if self.torus:
+                next_x %= self.x
+                next_y %= self.y
             if (0 <= next_x < self.x) and (0 <= next_y < self.y):
                 if self.world[next_y][next_x]:
                     alive += 1

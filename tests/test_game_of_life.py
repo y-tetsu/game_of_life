@@ -15,6 +15,7 @@ class TestGameOfLife(unittest.TestCase):
         self.assertEqual(game.console.life, '■')
         self.assertEqual(game.ratio, 0.5)
         self.assertEqual(game.loop, False)
+        self.assertEqual(game.torus, False)
 
     def test_init_specific(self):
         x = 3
@@ -32,9 +33,10 @@ class TestGameOfLife(unittest.TestCase):
         life = '★'
         ratio = 0.9
         loop = True
+        torus = True
         game = GameOfLife(title=title, world=world,
                           max_step=max_step, wait_time=wait_time, life=life,
-                          ratio=ratio, loop=loop)
+                          ratio=ratio, loop=loop, torus=torus)
         self.assertEqual(game.console.title, title)
         self.assertEqual(game.x, x)
         self.assertEqual(game.y, y)
@@ -44,6 +46,7 @@ class TestGameOfLife(unittest.TestCase):
         self.assertEqual(game.console.life, life)
         self.assertEqual(game.ratio, ratio)
         self.assertEqual(game.loop, loop)
+        self.assertEqual(game.torus, torus)
 
     def test_count_alive(self):
         world = [
@@ -60,6 +63,26 @@ class TestGameOfLife(unittest.TestCase):
         self.assertEqual(game.count_alive(0, 3), 2)
         self.assertEqual(game.count_alive(0, 4), 3)
         self.assertEqual(game.count_alive(1, 5), 4)
+        self.assertEqual(game.count_alive(3, 5), 5)
+        self.assertEqual(game.count_alive(2, 4), 6)
+        self.assertEqual(game.count_alive(4, 4), 7)
+        self.assertEqual(game.count_alive(6, 4), 8)
+
+    def test_count_alive_torus(self):
+        world = [
+            [1, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [1, 0, 0, 0, 0, 0, 0, 0],
+            [1, 0, 1, 1, 0, 1, 1, 1],
+            [1, 0, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1],
+        ]
+        game = GameOfLife(world=world, torus=True)
+        self.assertEqual(game.count_alive(0, 0), 3)
+        self.assertEqual(game.count_alive(0, 2), 2)
+        self.assertEqual(game.count_alive(0, 3), 4)
+        self.assertEqual(game.count_alive(0, 4), 6)
+        self.assertEqual(game.count_alive(1, 5), 5)
         self.assertEqual(game.count_alive(3, 5), 5)
         self.assertEqual(game.count_alive(2, 4), 6)
         self.assertEqual(game.count_alive(4, 4), 7)
