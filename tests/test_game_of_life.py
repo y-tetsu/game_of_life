@@ -16,6 +16,7 @@ class TestGameOfLife(unittest.TestCase):
         self.assertEqual(game.ratio, 0.5)
         self.assertEqual(game.loop, False)
         self.assertEqual(game.torus, False)
+        self.assertEqual(game.age, False)
 
     def test_init_specific(self):
         x = 3
@@ -34,9 +35,10 @@ class TestGameOfLife(unittest.TestCase):
         ratio = 0.9
         loop = True
         torus = True
+        age = True
         game = GameOfLife(title=title, world=world,
                           max_step=max_step, wait_time=wait_time, life=life,
-                          ratio=ratio, loop=loop, torus=torus)
+                          ratio=ratio, loop=loop, torus=torus, age=age)
         self.assertEqual(game.console.title, title)
         self.assertEqual(game.x, x)
         self.assertEqual(game.y, y)
@@ -47,6 +49,7 @@ class TestGameOfLife(unittest.TestCase):
         self.assertEqual(game.ratio, ratio)
         self.assertEqual(game.loop, loop)
         self.assertEqual(game.torus, torus)
+        self.assertEqual(game.age, age)
 
     def test_count_alive(self):
         world = [
@@ -167,3 +170,41 @@ class TestGameOfLife(unittest.TestCase):
         for _ in range(4):
             game.update()
         self.assertEqual(game.world, expected)
+
+    def test_update_age(self):
+        world = [
+            [0, 0, 0, 0],
+            [0, 1, 1, 0],
+            [0, 1, 1, 0],
+            [0, 0, 0, 0],
+        ]
+        expected = [
+            [0, 0, 0, 0],
+            [0, 5, 5, 0],
+            [0, 5, 5, 0],
+            [0, 0, 0, 0],
+        ]
+        game = GameOfLife(world=world, age=True)
+        for _ in range(4):
+            game.update()
+        self.assertEqual(game.ages, expected)
+
+    def test_update_age2(self):
+        world = [
+            [0, 0, 0, 0, 0],
+            [0, 0, 1, 0, 0],
+            [0, 0, 1, 0, 0],
+            [0, 0, 1, 0, 0],
+            [0, 0, 0, 0, 0],
+        ]
+        expected = [
+            [0, 0, 0, 0, 0],
+            [0, 0, 1, 0, 0],
+            [0, 0, 5, 0, 0],
+            [0, 0, 1, 0, 0],
+            [0, 0, 0, 0, 0],
+        ]
+        game = GameOfLife(world=world, age=True)
+        for i in range(4):
+            game.update()
+        self.assertEqual(game.ages, expected)

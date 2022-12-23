@@ -11,7 +11,7 @@ import pprint
 class GameOfLife:
     def __init__(self, title='game_of_life', x=30, y=15, world=None,
                  max_step=100, wait_time=0.05, life='■', ratio=0.5,
-                 loop=False, torus=False, json_file=''):
+                 loop=False, torus=False, age=False, json_file=''):
         self.title = title
         self.x = x
         self.y = y
@@ -36,6 +36,7 @@ class GameOfLife:
         self.ratio = ratio
         self.loop = loop
         self.torus = torus
+        self.age = age
 
         if json_file is not None:
             rand = False
@@ -47,6 +48,7 @@ class GameOfLife:
             (-1,  1), (0,  1), (1,  1),
         ]
         self.step = 1
+        self.ages = [[x for x in row] for row in self.world]
         self.console = Console(self.x, self.y, self.title, self.life)
 
         if rand:
@@ -75,6 +77,7 @@ class GameOfLife:
                 self.ratio = settings['ratio']
                 self.loop = settings['loop']
                 self.torus = settings['torus']
+                self.age = settings['age']
         except FileNotFoundError:
             pass
 
@@ -82,7 +85,7 @@ class GameOfLife:
         try:
             self.console.setup()
             while True:
-                self.console.display(self.world, self.step)
+                self.console.display(self.world, self.step, self.ages)
                 if not self.loop and self.step == self.max_step:
                     break
                 self.update()
@@ -93,8 +96,24 @@ class GameOfLife:
             self.console.teardown()
 
     def update(self):
-        new_world = [[self.new_cell(x, y) for x in range(self.x)]
-                     for y in range(self.y)]
+        new_world = []
+        for y in range(self.y):
+            new_cells = []
+            for x in range(self.x):
+                new_cell = self.new_cell(x, y)
+                if new_cell:
+                    if self.age:
+                        if self.world[y][x]:
+                            self.ages[y][x] += 1
+                            if self.ages[y][x] > 60:
+                                self.ages[y][x] = 0
+                                new_cell = 0
+                        else:
+                            self.ages[y][x] = 1
+                else:
+                    self.ages[y][x] = 0
+                new_cells.append(new_cell)
+            new_world.append(new_cells)
         self.world = [[x for x in row] for row in new_world]
         self.step += 1
 
@@ -175,21 +194,28 @@ class Console:
     def cursor_up(self, n):
         print(f'\033[{n}A', end='')
 
-    def display(self, world, step):
+    def display(self, world, step, ages):
         if step > 1:
             self.cursor_up(self.y + 4)
         self.display_title()
-        self.display_world(world)
+        self.display_world(world, ages)
         self.display_step(step)
 
     def display_title(self):
         print(f'{self.title} ({self.x} x {self.y})')
 
-    def display_world(self, world):
+    def display_world(self, world, ages):
         print('┌' + '─' * (self.x * 2) + '┐')
         line = []
         for y in range(self.y):
-            cells = ''.join([self.life if i else '  ' for i in world[y]])
+            cells = ''
+            for x in range(self.x):
+                life = self.life
+                if ages[y][x] > 30:
+                    life = '・'
+                elif ages[y][x] > 10:
+                    life = '□'
+                cells += life if world[y][x] else '  '
             line.append('│' + cells + '│')
         print('\n'.join(line))
         print('└' + '─' * (self.x * 2) + '┘')
