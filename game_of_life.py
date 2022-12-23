@@ -52,8 +52,10 @@ class GameOfLife:
         self.x = x
         self.y = y
         if title in SAMPLES:
-            world = SAMPLES[title]['world']
-            max_step = SAMPLES[title]['max_step']
+            if 'world' in SAMPLES[title]:
+                world = SAMPLES[title]['world']
+            if 'max_step' in SAMPLES[title]:
+                max_step = SAMPLES[title]['max_step']
         if world is not None:
             self.x = len(world[0])
             self.y = len(world)
@@ -73,8 +75,10 @@ class GameOfLife:
     def start(self):
         try:
             self.console.setup()
-            for _ in range(self.max_step):
+            while True:
                 self.console.display(self.world, self.step)
+                if self.step == self.max_step:
+                    break
                 self.update()
                 self.wait()
         except KeyboardInterrupt:
@@ -83,22 +87,25 @@ class GameOfLife:
             self.console.teardown()
 
     def update(self):
-        next_state = [[x for x in row] for row in self.world]
-        for y, row in enumerate(self.world):
-            for x, cell in enumerate(row):
-                alive = 0
-                for dx, dy in self.dirs:
-                    next_x, next_y = x + dx, y + dy
-                    if (0 <= next_x < self.x) and (0 <= next_y < self.y):
-                        if self.world[next_y][next_x]:
-                            alive += 1
-                if cell:
-                    next_cell = 1 if alive == 2 or alive == 3 else 0
-                else:
-                    next_cell = 1 if alive == 3 else 0
-                next_state[y][x] = next_cell
-        self.world = [[x for x in row] for row in next_state]
+        new_world = [[self.new_cell(x, y) for x in range(self.x)]
+                     for y in range(self.y)]
+        self.world = [[x for x in row] for row in new_world]
         self.step += 1
+
+    def new_cell(self, x, y):
+        alive = self.count_alive(x, y)
+        if self.world[y][x]:
+            return 1 if alive == 2 or alive == 3 else 0
+        return 1 if alive == 3 else 0
+
+    def count_alive(self, x, y):
+        alive = 0
+        for dx, dy in self.dirs:
+            next_x, next_y = x + dx, y + dy
+            if (0 <= next_x < self.x) and (0 <= next_y < self.y):
+                if self.world[next_y][next_x]:
+                    alive += 1
+        return alive
 
     def wait(self):
         time.sleep(self.wait_time)
