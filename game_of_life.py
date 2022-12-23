@@ -1,4 +1,3 @@
-import os
 import time
 from platform import system
 from ctypes import windll
@@ -176,14 +175,14 @@ class Console:
         kernel.SetConsoleMode(kernel.GetStdHandle(-11), 7)
 
     def setup(self):
-        self.cls()
+        self.clear_screen()
         self.cursor_hyde()
 
     def teardown(self):
         self.cursor_show()
 
-    def cls(self):
-        os.system('cls')
+    def clear_screen(self):
+        print("\033[;H\033[2J")
 
     def cursor_hyde(self):
         print('\033[?25l', end='')
