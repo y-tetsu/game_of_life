@@ -150,9 +150,9 @@ class Console:
         self.title = title
         self.life = life
         if 'win' in system().lower():
-            self.enable_win_escape_sequence()
+            self.enable_win_escape_code()
 
-    def enable_win_escape_sequence(self):
+    def enable_win_escape_code(self):
         kernel = windll.kernel32
         kernel.SetConsoleMode(kernel.GetStdHandle(-11), 7)
 
