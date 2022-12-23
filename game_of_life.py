@@ -2,7 +2,7 @@ import os
 import time
 from platform import system
 from ctypes import windll
-from random import randint
+from random import random
 
 
 SAMPLES = {
@@ -48,7 +48,7 @@ SAMPLES = {
 
 class GameOfLife:
     def __init__(self, title='game_of_life', x=30, y=15, world=None,
-                 max_step=100, wait_time=0.05, life='■'):
+                 max_step=100, wait_time=0.05, life='■', ratio=0.5):
         self.x = x
         self.y = y
         if title in SAMPLES:
@@ -61,9 +61,11 @@ class GameOfLife:
             self.y = len(world)
             self.world = [[x for x in row] for row in world]
         else:
-            self.world = [[randint(0, 1) for _ in range(x)] for _ in range(y)]
+            self.world = [[1 if random() < ratio else 0 for _ in range(x)]
+                          for _ in range(y)]
         self.max_step = max_step
         self.wait_time = wait_time
+        self.ratio = ratio
         self.dirs = [
             (-1, -1), (0, -1), (1, -1),
             (-1,  0),          (1,  0),
