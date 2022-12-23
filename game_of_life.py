@@ -8,47 +8,6 @@ import json
 import pprint
 
 
-SAMPLES = {
-    'glider': {
-        'world': [
-            [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        ],
-        'max_step': 40,
-    },
-    'galaxy': {
-        'world': [
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0],
-            [0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0],
-            [0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0],
-            [0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0],
-            [0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0],
-            [0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0],
-            [0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        ],
-        'max_step': 45,
-    },
-}
-
-
 class GameOfLife:
     def __init__(self, title='game_of_life', x=30, y=15, world=None,
                  max_step=100, wait_time=0.05, life='■', ratio=0.5,
@@ -57,11 +16,12 @@ class GameOfLife:
         self.x = x
         self.y = y
         rand = False
-        if title in SAMPLES:
-            if 'world' in SAMPLES[title]:
-                world = SAMPLES[title]['world']
-            if 'max_step' in SAMPLES[title]:
-                max_step = SAMPLES[title]['max_step']
+        samples = self.load_samples('samples.json')
+        if title in samples:
+            if 'world' in samples[title]:
+                world = samples[title]['world']
+            if 'max_step' in samples[title]:
+                max_step = samples[title]['max_step']
         if world is not None:
             self.x = len(world[0])
             self.y = len(world)
@@ -91,6 +51,15 @@ class GameOfLife:
 
         if rand:
             self.dump()
+
+    def load_samples(self, samples_file):
+        samples = {}
+        try:
+            with open(samples_file, 'r') as f:
+                samples = json.load(f)
+        except FileNotFoundError:
+            pass
+        return samples
 
     def load(self, json_file):
         try:
@@ -232,7 +201,7 @@ class Console:
 if __name__ == '__main__':
     import sys
     argv = sys.argv
-    if len(argv) == 2 and argv[1] in SAMPLES:
+    if len(argv) == 2:
         GameOfLife(title=argv[1]).start()
     elif len(argv) == 3 and int(argv[1]) > 0 and int(argv[2]) > 0:
         GameOfLife(x=int(argv[1]), y=int(argv[2])).start()
