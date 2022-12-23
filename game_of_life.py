@@ -48,7 +48,8 @@ SAMPLES = {
 
 class GameOfLife:
     def __init__(self, title='game_of_life', x=30, y=15, world=None,
-                 max_step=100, wait_time=0.05, life='■', ratio=0.5):
+                 max_step=100, wait_time=0.05, life='■', ratio=0.5,
+                 loop=False):
         self.x = x
         self.y = y
         if title in SAMPLES:
@@ -66,6 +67,7 @@ class GameOfLife:
         self.max_step = max_step
         self.wait_time = wait_time
         self.ratio = ratio
+        self.loop = loop
         self.dirs = [
             (-1, -1), (0, -1), (1, -1),
             (-1,  0),          (1,  0),
@@ -79,7 +81,7 @@ class GameOfLife:
             self.console.setup()
             while True:
                 self.console.display(self.world, self.step)
-                if self.step == self.max_step:
+                if not self.loop and self.step == self.max_step:
                     break
                 self.update()
                 self.wait()

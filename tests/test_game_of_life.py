@@ -14,6 +14,7 @@ class TestGameOfLife(unittest.TestCase):
         self.assertEqual(game.wait_time, 0.05)
         self.assertEqual(game.console.life, '■')
         self.assertEqual(game.ratio, 0.5)
+        self.assertEqual(game.loop, False)
 
     def test_init_specific(self):
         x = 3
@@ -30,9 +31,10 @@ class TestGameOfLife(unittest.TestCase):
         wait_time = 0.5
         life = '★'
         ratio = 0.9
+        loop = True
         game = GameOfLife(title=title, world=world,
                           max_step=max_step, wait_time=wait_time, life=life,
-                          ratio=ratio)
+                          ratio=ratio, loop=loop)
         self.assertEqual(game.console.title, title)
         self.assertEqual(game.x, x)
         self.assertEqual(game.y, y)
@@ -41,6 +43,7 @@ class TestGameOfLife(unittest.TestCase):
         self.assertEqual(game.wait_time, wait_time)
         self.assertEqual(game.console.life, life)
         self.assertEqual(game.ratio, ratio)
+        self.assertEqual(game.loop, loop)
 
     def test_count_alive(self):
         world = [
