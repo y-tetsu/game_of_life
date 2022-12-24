@@ -17,6 +17,7 @@ class TestGameOfLife(unittest.TestCase):
         self.assertEqual(game.loop, False)
         self.assertEqual(game.torus, False)
         self.assertEqual(game.age, False)
+        self.assertEqual(game.color, False)
 
     def test_init_specific(self):
         x = 3
@@ -36,9 +37,11 @@ class TestGameOfLife(unittest.TestCase):
         loop = True
         torus = True
         age = True
+        color = True
         game = GameOfLife(title=title, world=world,
                           max_step=max_step, wait_time=wait_time, life=life,
-                          ratio=ratio, loop=loop, torus=torus, age=age)
+                          ratio=ratio, loop=loop, torus=torus, age=age,
+                          color=color)
         self.assertEqual(game.console.title, title)
         self.assertEqual(game.x, x)
         self.assertEqual(game.y, y)
@@ -50,6 +53,7 @@ class TestGameOfLife(unittest.TestCase):
         self.assertEqual(game.loop, loop)
         self.assertEqual(game.torus, torus)
         self.assertEqual(game.age, age)
+        self.assertEqual(game.color, color)
 
     def test_count_alive(self):
         world = [
@@ -61,15 +65,15 @@ class TestGameOfLife(unittest.TestCase):
             [1, 1, 1, 1, 1, 1, 1, 1],
         ]
         game = GameOfLife(world=world)
-        self.assertEqual(game.count_alive(0, 0), 0)
-        self.assertEqual(game.count_alive(0, 2), 1)
-        self.assertEqual(game.count_alive(0, 3), 2)
-        self.assertEqual(game.count_alive(0, 4), 3)
-        self.assertEqual(game.count_alive(1, 5), 4)
-        self.assertEqual(game.count_alive(3, 5), 5)
-        self.assertEqual(game.count_alive(2, 4), 6)
-        self.assertEqual(game.count_alive(4, 4), 7)
-        self.assertEqual(game.count_alive(6, 4), 8)
+        self.assertEqual(game.count_alive(0, 0), (0, 0))
+        self.assertEqual(game.count_alive(0, 2), (1, 0))
+        self.assertEqual(game.count_alive(0, 3), (2, 0))
+        self.assertEqual(game.count_alive(0, 4), (3, 0))
+        self.assertEqual(game.count_alive(1, 5), (4, 0))
+        self.assertEqual(game.count_alive(3, 5), (5, 0))
+        self.assertEqual(game.count_alive(2, 4), (6, 0))
+        self.assertEqual(game.count_alive(4, 4), (7, 0))
+        self.assertEqual(game.count_alive(6, 4), (8, 0))
 
     def test_count_alive_torus(self):
         world = [
@@ -81,15 +85,37 @@ class TestGameOfLife(unittest.TestCase):
             [1, 1, 1, 1, 1, 1, 1, 1],
         ]
         game = GameOfLife(world=world, torus=True)
-        self.assertEqual(game.count_alive(0, 0), 3)
-        self.assertEqual(game.count_alive(0, 2), 2)
-        self.assertEqual(game.count_alive(0, 3), 4)
-        self.assertEqual(game.count_alive(0, 4), 6)
-        self.assertEqual(game.count_alive(1, 5), 5)
-        self.assertEqual(game.count_alive(3, 5), 5)
-        self.assertEqual(game.count_alive(2, 4), 6)
-        self.assertEqual(game.count_alive(4, 4), 7)
-        self.assertEqual(game.count_alive(6, 4), 8)
+        self.assertEqual(game.count_alive(0, 0), (3, 0))
+        self.assertEqual(game.count_alive(0, 2), (2, 0))
+        self.assertEqual(game.count_alive(0, 3), (4, 0))
+        self.assertEqual(game.count_alive(0, 4), (6, 0))
+        self.assertEqual(game.count_alive(1, 5), (5, 0))
+        self.assertEqual(game.count_alive(3, 5), (5, 0))
+        self.assertEqual(game.count_alive(2, 4), (6, 0))
+        self.assertEqual(game.count_alive(4, 4), (7, 0))
+        self.assertEqual(game.count_alive(6, 4), (8, 0))
+
+    def test_count_alive_color(self):
+        world = [
+            [1, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [1, 0, 0, 0, 0, 0, 0, 0],
+            [1, 0, 1, 1, 0, 1, 1, 1],
+            [1, 0, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1],
+        ]
+        colors = [
+            [1, 2, 0, 0, 0, 0, 0, 0],
+            [0, 1, 0, 0, 0, 0, 0, 0],
+            [1, 0, 0, 0, 0, 0, 0, 0],
+            [1, 0, 1, 1, 0, 1, 1, 1],
+            [1, 0, 1, 1, 8, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1],
+        ]
+        game = GameOfLife(world=world, torus=True, color=True)
+        game.colors = colors
+        self.assertEqual(game.count_alive(0, 0), (3, 2))
+        self.assertEqual(game.count_alive(3, 5), (5, 8))
 
     def test_new_cell_from_alive(self):
         world = [
