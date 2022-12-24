@@ -5,6 +5,7 @@ from game_of_life import GameOfLife
 class TestGameOfLife(unittest.TestCase):
     def test_init_default(self):
         game = GameOfLife()
+        self.assertIsNone(game.sample)
         self.assertEqual(game.console.title, 'game_of_life')
         self.assertEqual(game.x, 30)
         self.assertEqual(game.y, 15)
@@ -29,6 +30,7 @@ class TestGameOfLife(unittest.TestCase):
             [1, 0, 1],
             [1, 1, 1],
         ]
+        sample = 'test'
         title = 'test'
         max_step = 10
         wait_time = 0.5
@@ -38,10 +40,11 @@ class TestGameOfLife(unittest.TestCase):
         torus = True
         age = True
         color = True
-        game = GameOfLife(title=title, world=world,
+        game = GameOfLife(sample=sample, title=title, world=world,
                           max_step=max_step, wait_time=wait_time, life=life,
                           ratio=ratio, loop=loop, torus=torus, age=age,
                           color=color)
+        self.assertEqual(game.sample, sample)
         self.assertEqual(game.console.title, title)
         self.assertEqual(game.x, x)
         self.assertEqual(game.y, y)

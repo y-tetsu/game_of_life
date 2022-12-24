@@ -8,20 +8,22 @@ import pprint
 
 
 class GameOfLife:
-    def __init__(self, title='game_of_life', x=30, y=15, world=None,
-                 max_step=100, wait_time=0.05, life='■', ratio=0.5,
-                 loop=False, torus=False, age=False, color=False,
+    def __init__(self, sample=None, title='game_of_life', x=30, y=15,
+                 world=None, max_step=100, wait_time=0.05, life='■',
+                 ratio=0.5, loop=False, torus=False, age=False, color=False,
                  json_file=None):
+        self.sample = sample
         self.title = title
         self.x = x
         self.y = y
         rand = False
         samples = self.load_samples('samples.json')
-        if title in samples:
-            if 'world' in samples[title]:
-                world = samples[title]['world']
-            if 'max_step' in samples[title]:
-                max_step = samples[title]['max_step']
+        if sample in samples:
+            self.title = sample
+            if 'world' in samples[sample]:
+                world = samples[sample]['world']
+            if 'max_step' in samples[sample]:
+                max_step = samples[sample]['max_step']
         if world is not None:
             self.x = len(world[0])
             self.y = len(world)
@@ -251,11 +253,47 @@ class Console:
 
 
 if __name__ == '__main__':
-    import sys
-    argv = sys.argv
-    if len(argv) == 2:
-        GameOfLife(title=argv[1]).start()
-    elif len(argv) == 3 and int(argv[1]) > 0 and int(argv[2]) > 0:
-        GameOfLife(x=int(argv[1]), y=int(argv[2])).start()
-    else:
-        GameOfLife().start()
+    import argparse
+
+    parser = argparse.ArgumentParser(
+                description='A Game of life Simulator on CLI')
+    parser.add_argument('sample', nargs='?')
+    parser.add_argument('-e', '--title')
+    parser.add_argument('-x', type=int)
+    parser.add_argument('-y', type=int)
+    parser.add_argument('-w', '--world')
+    parser.add_argument('-s', '--step', type=int)
+    parser.add_argument('-i', '--wait', type=float)
+    parser.add_argument('-f', '--life')
+    parser.add_argument('-r', '--ratio', type=float)
+    parser.add_argument('-l', '--loop', action="store_false")
+    parser.add_argument('-t', '--torus', action="store_false")
+    parser.add_argument('-a', '--age', action="store_false")
+    parser.add_argument('-c', '--color', action="store_false")
+    args = parser.parse_args()
+
+    setting = {}
+    if args.sample:
+        setting['sample'] = args.sample
+    if args.title:
+        setting['title'] = args.title
+    if args.x:
+        setting['x'] = args.x
+    if args.y:
+        setting['y'] = args.y
+    if args.world:
+        setting['json_file'] = args.world
+    if args.step:
+        setting['max_step'] = args.step
+    if args.wait:
+        setting['wait_time'] = args.wait
+    if args.life:
+        setting['life'] = args.life
+    if args.ratio:
+        setting['ratio'] = args.ratio
+    setting['loop'] = False if args.loop else True
+    setting['torus'] = False if args.torus else True
+    setting['age'] = False if args.age else True
+    setting['color'] = False if args.color else True
+
+    GameOfLife(**setting).start()
