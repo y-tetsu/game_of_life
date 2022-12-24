@@ -10,7 +10,7 @@ import pprint
 class GameOfLife:
     def __init__(self, title='game_of_life', x=30, y=15, world=None,
                  max_step=100, wait_time=0.05, life='■', ratio=0.5,
-                 loop=False, torus=False, age=False, json_file=''):
+                 loop=False, torus=False, age=False, json_file=None):
         self.title = title
         self.x = x
         self.y = y
@@ -151,6 +151,7 @@ class GameOfLife:
             'ratio': self.ratio,
             'loop': self.loop,
             'torus': self.torus,
+            'age': self.age,
         }
         with open(json_file, 'w') as f:
             output = pprint.pformat(settings, indent=4,
