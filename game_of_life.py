@@ -117,8 +117,8 @@ class GameOfLife:
                 else:
                     self.ages[y][x] = 0
                     self.colors[y][x] = 0
-                new_cells.append(new_cell)
-            new_world.append(new_cells)
+                new_cells += [new_cell]
+            new_world += [new_cells]
         self.world = [[x for x in row] for row in new_world]
         self.step += 1
 
@@ -242,7 +242,7 @@ class Console:
                 color = colors[y][x] % len(self.color_list)
                 life = self.color_list[color] + life + self.color_list[0]
                 cells += life if world[y][x] else '  '
-            line.append('│' + cells + '│')
+            line += ['│' + cells + '│']
         print('\n'.join(line))
         print('└' + '─' * (self.x * 2) + '┘')
 
