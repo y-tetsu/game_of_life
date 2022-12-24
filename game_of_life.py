@@ -262,7 +262,7 @@ if __name__ == '__main__':
     parser.add_argument('-y', type=int)
     parser.add_argument('-j', '--json')
     parser.add_argument('-s', '--step', type=int)
-    parser.add_argument('-i', '--wait', type=float)
+    parser.add_argument('-w', '--wait', type=float)
     parser.add_argument('-a', '--alive')
     parser.add_argument('-r', '--ratio', type=float)
     parser.add_argument('-l', '--loop', action="store_true")
