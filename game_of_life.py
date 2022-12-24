@@ -18,12 +18,15 @@ class GameOfLife:
         self.y = y
         rand = False
         samples = self.load_samples('samples.json')
+        colors = None
         if sample in samples:
             self.name = sample
             if 'world' in samples[sample]:
                 world = samples[sample]['world']
             if 'max_step' in samples[sample]:
                 max_step = samples[sample]['max_step']
+            if 'colors' in samples[sample]:
+                colors = samples[sample]['colors']
         if world is not None:
             self.x = len(world[0])
             self.y = len(world)
@@ -54,6 +57,8 @@ class GameOfLife:
         self.step = 1
         self.ages = [[x for x in row] for row in self.world]
         self.colors = [[0 for _ in row] for row in self.world]
+        if colors:
+            self.colors = colors
         self.console = Console(self.x, self.y, self.name, self.alive)
 
         if rand:
