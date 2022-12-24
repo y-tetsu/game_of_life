@@ -9,9 +9,9 @@ import pprint
 
 class GameOfLife:
     def __init__(self, sample=None, name='game_of_life', x=30, y=15,
-                 world=None, max_step=100, wait_time=0.05, alive='■',
-                 ratio=0.5, loop=False, torus=False, mortal=False, color=False,
-                 json_file=None):
+                 world=None, max_step=100, wait_time=0.05, delay=0.0,
+                 alive='■', ratio=0.5, loop=False, torus=False, mortal=False,
+                 color=False, json_file=None):
         self.sample = sample
         self.name = name
         self.x = x
@@ -34,6 +34,7 @@ class GameOfLife:
                           for _ in range(y)]
         self.max_step = max_step
         self.wait_time = wait_time
+        self.delay = delay
         self.alive = alive
         self.ratio = ratio
         self.loop = loop
@@ -77,6 +78,7 @@ class GameOfLife:
                 self.world = settings['world']
                 self.max_step = settings['step']
                 self.wait_time = settings['wait']
+                self.delay = settings['delay']
                 self.alive = settings['alive']
                 self.ratio = settings['ratio']
                 self.loop = settings['loop']
@@ -94,6 +96,8 @@ class GameOfLife:
                                      self.ages, self.colors)
                 if not self.loop and self.step == self.max_step:
                     break
+                if self.step == 1:
+                    time.sleep(self.delay)
                 self.update()
                 self.wait()
         except KeyboardInterrupt:
@@ -160,6 +164,7 @@ class GameOfLife:
             'world': self.world,
             'step': self.max_step,
             'wait': self.wait_time,
+            'delay': self.delay,
             'alive': self.console.alive,
             'ratio': self.ratio,
             'loop': self.loop,
@@ -263,6 +268,7 @@ if __name__ == '__main__':
     parser.add_argument('-j', '--json')
     parser.add_argument('-s', '--step', type=int)
     parser.add_argument('-w', '--wait', type=float)
+    parser.add_argument('-d', '--delay', type=float)
     parser.add_argument('-a', '--alive')
     parser.add_argument('-r', '--ratio', type=float)
     parser.add_argument('-l', '--loop', action="store_true")
@@ -286,6 +292,8 @@ if __name__ == '__main__':
         setting['max_step'] = args.step
     if args.wait:
         setting['wait_time'] = args.wait
+    if args.delay:
+        setting['delay'] = args.delay
     if args.alive:
         setting['alive'] = args.alive
     if args.ratio:

@@ -13,6 +13,7 @@ class TestGameOfLife(unittest.TestCase):
         self.assertEqual(len(game.world), 15)
         self.assertEqual(game.max_step, 100)
         self.assertEqual(game.wait_time, 0.05)
+        self.assertEqual(game.delay, 0.0)
         self.assertEqual(game.console.alive, '■')
         self.assertEqual(game.ratio, 0.5)
         self.assertEqual(game.loop, False)
@@ -34,6 +35,7 @@ class TestGameOfLife(unittest.TestCase):
         name = 'test'
         max_step = 10
         wait_time = 0.5
+        delay = 0.5
         alive = '★'
         ratio = 0.9
         loop = True
@@ -41,9 +43,9 @@ class TestGameOfLife(unittest.TestCase):
         mortal = True
         color = True
         game = GameOfLife(sample=sample, name=name, world=world,
-                          max_step=max_step, wait_time=wait_time, alive=alive,
-                          ratio=ratio, loop=loop, torus=torus, mortal=mortal,
-                          color=color)
+                          max_step=max_step, wait_time=wait_time, delay=delay,
+                          alive=alive, ratio=ratio, loop=loop, torus=torus,
+                          mortal=mortal, color=color)
         self.assertEqual(game.sample, sample)
         self.assertEqual(game.console.name, name)
         self.assertEqual(game.x, x)
@@ -51,6 +53,7 @@ class TestGameOfLife(unittest.TestCase):
         self.assertEqual(game.world, world)
         self.assertEqual(game.max_step, max_step)
         self.assertEqual(game.wait_time, wait_time)
+        self.assertEqual(game.delay, delay)
         self.assertEqual(game.console.alive, alive)
         self.assertEqual(game.ratio, ratio)
         self.assertEqual(game.loop, loop)
