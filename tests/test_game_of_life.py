@@ -6,18 +6,18 @@ class TestGameOfLife(unittest.TestCase):
     def test_init_default(self):
         game = GameOfLife()
         self.assertIsNone(game.sample)
-        self.assertEqual(game.console.title, 'game_of_life')
+        self.assertEqual(game.console.name, 'game_of_life')
         self.assertEqual(game.x, 30)
         self.assertEqual(game.y, 15)
         self.assertEqual(len(game.world[0]), 30)
         self.assertEqual(len(game.world), 15)
         self.assertEqual(game.max_step, 100)
         self.assertEqual(game.wait_time, 0.05)
-        self.assertEqual(game.console.life, '■')
+        self.assertEqual(game.console.alive, '■')
         self.assertEqual(game.ratio, 0.5)
         self.assertEqual(game.loop, False)
         self.assertEqual(game.torus, False)
-        self.assertEqual(game.age, False)
+        self.assertEqual(game.mortal, False)
         self.assertEqual(game.color, False)
 
     def test_init_specific(self):
@@ -31,31 +31,31 @@ class TestGameOfLife(unittest.TestCase):
             [1, 1, 1],
         ]
         sample = 'test'
-        title = 'test'
+        name = 'test'
         max_step = 10
         wait_time = 0.5
-        life = '★'
+        alive = '★'
         ratio = 0.9
         loop = True
         torus = True
-        age = True
+        mortal = True
         color = True
-        game = GameOfLife(sample=sample, title=title, world=world,
-                          max_step=max_step, wait_time=wait_time, life=life,
-                          ratio=ratio, loop=loop, torus=torus, age=age,
+        game = GameOfLife(sample=sample, name=name, world=world,
+                          max_step=max_step, wait_time=wait_time, alive=alive,
+                          ratio=ratio, loop=loop, torus=torus, mortal=mortal,
                           color=color)
         self.assertEqual(game.sample, sample)
-        self.assertEqual(game.console.title, title)
+        self.assertEqual(game.console.name, name)
         self.assertEqual(game.x, x)
         self.assertEqual(game.y, y)
         self.assertEqual(game.world, world)
         self.assertEqual(game.max_step, max_step)
         self.assertEqual(game.wait_time, wait_time)
-        self.assertEqual(game.console.life, life)
+        self.assertEqual(game.console.alive, alive)
         self.assertEqual(game.ratio, ratio)
         self.assertEqual(game.loop, loop)
         self.assertEqual(game.torus, torus)
-        self.assertEqual(game.age, age)
+        self.assertEqual(game.mortal, mortal)
         self.assertEqual(game.color, color)
 
     def test_count_alive(self):
@@ -200,7 +200,7 @@ class TestGameOfLife(unittest.TestCase):
             game.update()
         self.assertEqual(game.world, expected)
 
-    def test_update_age(self):
+    def test_update_mortal(self):
         world = [
             [0, 0, 0, 0],
             [0, 1, 1, 0],
@@ -213,12 +213,12 @@ class TestGameOfLife(unittest.TestCase):
             [0, 5, 5, 0],
             [0, 0, 0, 0],
         ]
-        game = GameOfLife(world=world, age=True)
+        game = GameOfLife(world=world, mortal=True)
         for _ in range(4):
             game.update()
         self.assertEqual(game.ages, expected)
 
-    def test_update_age2(self):
+    def test_update_mortal2(self):
         world = [
             [0, 0, 0, 0, 0],
             [0, 0, 1, 0, 0],
@@ -233,7 +233,7 @@ class TestGameOfLife(unittest.TestCase):
             [0, 0, 1, 0, 0],
             [0, 0, 0, 0, 0],
         ]
-        game = GameOfLife(world=world, age=True)
+        game = GameOfLife(world=world, mortal=True)
         for i in range(4):
             game.update()
         self.assertEqual(game.ages, expected)

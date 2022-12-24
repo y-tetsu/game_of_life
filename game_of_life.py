@@ -8,18 +8,18 @@ import pprint
 
 
 class GameOfLife:
-    def __init__(self, sample=None, title='game_of_life', x=30, y=15,
-                 world=None, max_step=100, wait_time=0.05, life='■',
-                 ratio=0.5, loop=False, torus=False, age=False, color=False,
+    def __init__(self, sample=None, name='game_of_life', x=30, y=15,
+                 world=None, max_step=100, wait_time=0.05, alive='■',
+                 ratio=0.5, loop=False, torus=False, mortal=False, color=False,
                  json_file=None):
         self.sample = sample
-        self.title = title
+        self.name = name
         self.x = x
         self.y = y
         rand = False
         samples = self.load_samples('samples.json')
         if sample in samples:
-            self.title = sample
+            self.name = sample
             if 'world' in samples[sample]:
                 world = samples[sample]['world']
             if 'max_step' in samples[sample]:
@@ -34,11 +34,11 @@ class GameOfLife:
                           for _ in range(y)]
         self.max_step = max_step
         self.wait_time = wait_time
-        self.life = life
+        self.alive = alive
         self.ratio = ratio
         self.loop = loop
         self.torus = torus
-        self.age = age
+        self.mortal = mortal
         self.color = color
 
         if json_file is not None:
@@ -53,7 +53,7 @@ class GameOfLife:
         self.step = 1
         self.ages = [[x for x in row] for row in self.world]
         self.colors = [[0 for _ in row] for row in self.world]
-        self.console = Console(self.x, self.y, self.title, self.life)
+        self.console = Console(self.x, self.y, self.name, self.alive)
 
         if rand:
             self.dump()
@@ -71,17 +71,17 @@ class GameOfLife:
         try:
             with open(json_file, 'r') as f:
                 settings = json.load(f)
-                self.title = settings['title']
+                self.name = settings['name']
                 self.x = settings['x']
                 self.y = settings['y']
                 self.world = settings['world']
                 self.max_step = settings['step']
                 self.wait_time = settings['wait']
-                self.life = settings['life']
+                self.alive = settings['alive']
                 self.ratio = settings['ratio']
                 self.loop = settings['loop']
                 self.torus = settings['torus']
-                self.age = settings['age']
+                self.mortal = settings['mortal']
                 self.color = settings['color']
         except FileNotFoundError:
             pass
@@ -108,7 +108,7 @@ class GameOfLife:
             for x in range(self.x):
                 new_cell = self.new_cell(x, y)
                 if new_cell:
-                    if self.age:
+                    if self.mortal:
                         if self.world[y][x]:
                             self.ages[y][x] += 1
                             if self.ages[y][x] > 60:
@@ -154,17 +154,17 @@ class GameOfLife:
         now = datetime.now().strftime('%Y%m%d%H%M%S')
         json_file = 'world' + now + '.json'
         settings = {
-            'title': self.console.title,
+            'name': self.console.name,
             'x': self.x,
             'y': self.y,
             'world': self.world,
             'step': self.max_step,
             'wait': self.wait_time,
-            'life': self.console.life,
+            'alive': self.console.alive,
             'ratio': self.ratio,
             'loop': self.loop,
             'torus': self.torus,
-            'age': self.age,
+            'mortal': self.mortal,
             'color': self.color,
         }
         with open(json_file, 'w') as f:
@@ -177,11 +177,11 @@ class GameOfLife:
 
 
 class Console:
-    def __init__(self, x, y, title, life):
+    def __init__(self, x, y, name, alive):
         self.x = x
         self.y = y
-        self.title = title
-        self.life = life
+        self.name = name
+        self.alive = alive
         if 'win' in system().lower():
             self.enable_win_escape_code()
         self.color_list = [
@@ -228,7 +228,7 @@ class Console:
         self.display_step(step)
 
     def display_title(self):
-        print(f'{self.title} ({self.x} x {self.y})')
+        print(f'{self.name} ({self.x} x {self.y})')
 
     def display_world(self, world, ages, colors):
         print('┌' + '─' * (self.x * 2) + '┐')
@@ -236,14 +236,14 @@ class Console:
         for y in range(self.y):
             cells = ''
             for x in range(self.x):
-                life = self.life
+                alive = self.alive
                 if ages[y][x] > 30:
-                    life = '・'
+                    alive = '・'
                 elif ages[y][x] > 10:
-                    life = '□'
+                    alive = '□'
                 color = colors[y][x] % len(self.color_list)
-                life = self.color_list[color] + life + self.color_list[0]
-                cells += life if world[y][x] else '  '
+                alive = self.color_list[color] + alive + self.color_list[0]
+                cells += alive if world[y][x] else '  '
             line += ['│' + cells + '│']
         print('\n'.join(line))
         print('└' + '─' * (self.x * 2) + '┘')
@@ -254,46 +254,45 @@ class Console:
 
 if __name__ == '__main__':
     import argparse
-
     parser = argparse.ArgumentParser(
                 description='A Game of life Simulator on CLI')
     parser.add_argument('sample', nargs='?')
-    parser.add_argument('-e', '--title')
+    parser.add_argument('-n', '--name')
     parser.add_argument('-x', type=int)
     parser.add_argument('-y', type=int)
-    parser.add_argument('-w', '--world')
+    parser.add_argument('-j', '--json')
     parser.add_argument('-s', '--step', type=int)
     parser.add_argument('-i', '--wait', type=float)
-    parser.add_argument('-f', '--life')
+    parser.add_argument('-a', '--alive')
     parser.add_argument('-r', '--ratio', type=float)
-    parser.add_argument('-l', '--loop', action="store_false")
-    parser.add_argument('-t', '--torus', action="store_false")
-    parser.add_argument('-a', '--age', action="store_false")
-    parser.add_argument('-c', '--color', action="store_false")
+    parser.add_argument('-l', '--loop', action="store_true")
+    parser.add_argument('-t', '--torus', action="store_true")
+    parser.add_argument('-m', '--mortal', action="store_true")
+    parser.add_argument('-c', '--color', action="store_true")
     args = parser.parse_args()
 
     setting = {}
     if args.sample:
         setting['sample'] = args.sample
-    if args.title:
-        setting['title'] = args.title
+    if args.name:
+        setting['name'] = args.name
     if args.x:
         setting['x'] = args.x
     if args.y:
         setting['y'] = args.y
-    if args.world:
-        setting['json_file'] = args.world
+    if args.json:
+        setting['json_file'] = args.json
     if args.step:
         setting['max_step'] = args.step
     if args.wait:
         setting['wait_time'] = args.wait
-    if args.life:
-        setting['life'] = args.life
+    if args.alive:
+        setting['alive'] = args.alive
     if args.ratio:
         setting['ratio'] = args.ratio
-    setting['loop'] = False if args.loop else True
-    setting['torus'] = False if args.torus else True
-    setting['age'] = False if args.age else True
-    setting['color'] = False if args.color else True
+    setting['loop'] = args.loop
+    setting['torus'] = args.torus
+    setting['mortal'] = args.mortal
+    setting['color'] = args.color
 
     GameOfLife(**setting).start()
