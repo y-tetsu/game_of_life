@@ -255,7 +255,7 @@ class Console:
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(
-                description='A Game of life Simulator on CLI')
+                description='A game of life simulator on CLI')
     parser.add_argument('sample', nargs='?')
     parser.add_argument('-n', '--name')
     parser.add_argument('-x', type=int)
