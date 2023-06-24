@@ -53,3 +53,10 @@ py game_of_life.py glider-gun -c
 ```
 py game_of_life.py bleeder1 -d 2
 ```
+
+### ブリーダー2
+<img src="images/bleeder2.gif" width="450px">
+
+```
+py game_of_life.py bleeder2 -d 2
+```
