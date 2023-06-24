@@ -48,15 +48,15 @@ py game_of_life.py glider-gun -c
 ```
 
 ### ブリーダー1
-<img src="images/bleeder1.gif" width="450px">
+<img src="images/breeder1.gif" width="450px">
 
 ```
-py game_of_life.py bleeder1 -d 2
+py game_of_life.py breeder1 -d 2
 ```
 
 ### ブリーダー2
-<img src="images/bleeder2.gif" width="450px">
+<img src="images/breeder2.gif" width="450px">
 
 ```
-py game_of_life.py bleeder2 -d 2
+py game_of_life.py breeder2 -d 2
 ```
