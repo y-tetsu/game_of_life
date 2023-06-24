@@ -12,58 +12,62 @@ https://qiita.com/y-tetsu/items/264d263717f933ad3cb2
 py game_of_life.py
 ```
 
-### 八角形
+### 振動子
+#### 八角形
 <img src="images/octagon.gif" width="450px">
 
 ```
 py game_of_life.py octagon
 ```
 
-### グライダー
-<img src="images/glider.gif" width="450px">
-
-```
-py game_of_life.py glider
-```
-
-### 銀河
+#### 銀河
 <img src="images/galaxy.gif" width="450px">
 
 ```
 py game_of_life.py galaxy
 ```
 
-### ダイハード
-<img src="images/die-hard.gif" width="450px">
+### 移動物体
+#### グライダー
+<img src="images/glider.gif" width="450px">
 
 ```
-py game_of_life.py die-hard
+py game_of_life.py glider
 ```
 
-### 軽量級宇宙船
+#### 軽量級宇宙船
 <img src="images/l-spaceship.gif" width="450px">
 
 ```
 py game_of_life.py l-spaceship
 ```
 
-### グライダー銃
-<img src="images/glider-gun.gif" width="450px">
-
-```
-py game_of_life.py glider-gun -c
-```
-
-### ブリーダー1
+### 繁殖型
+#### ブリーダー1
 <img src="images/breeder1.gif" width="450px">
 
 ```
 py game_of_life.py breeder1 -d 2
 ```
 
-### ブリーダー2
+#### ブリーダー2
 <img src="images/breeder2.gif" width="450px">
 
 ```
 py game_of_life.py breeder2 -d 2
+```
+
+#### グライダー銃
+<img src="images/glider-gun.gif" width="450px">
+
+```
+py game_of_life.py glider-gun -c
+```
+
+### 長寿型
+#### ダイハード
+<img src="images/die-hard.gif" width="450px">
+
+```
+py game_of_life.py die-hard
 ```
