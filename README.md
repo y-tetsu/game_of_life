@@ -46,3 +46,10 @@ py game_of_life.py die-hard
 ```
 py game_of_life.py glider-gun -c
 ```
+
+### ブリーダー1
+<img src="images/bleeder1.gif" width="450px">
+
+```
+py game_of_life.py bleeder1 -d 2
+```
