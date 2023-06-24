@@ -40,6 +40,13 @@ py game_of_life.py galaxy
 py game_of_life.py die-hard
 ```
 
+### 軽量級宇宙船
+<img src="images/l-spaceship.gif" width="450px">
+
+```
+py game_of_life.py l-spaceship
+```
+
 ### グライダー銃
 <img src="images/glider-gun.gif" width="450px">
 
