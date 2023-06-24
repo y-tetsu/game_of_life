@@ -44,5 +44,5 @@ py game_of_life.py die-hard
 <img src="images/glider-gun.gif" width="450px">
 
 ```
-py game_of_life.py glider-gun
+py game_of_life.py glider-gun -c
 ```
