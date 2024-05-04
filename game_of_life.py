@@ -243,16 +243,17 @@ class Console:
     def display_world(self, world, ages, colors):
         print('┌' + '─' * (self.x * 2) + '┐')
         line = []
+        alives = ((self.alive, 10), ('□', 30), ('・', 60))
         for y in range(self.y):
             cells = ''
             for x in range(self.x):
-                alive = self.alive
-                if ages[y][x] > 30:
-                    alive = '・'
-                elif ages[y][x] > 10:
-                    alive = '□'
+                display = None
+                for alive in alives:
+                    if ages[y][x] <= alive[1]:
+                        display = alive[0]
+                        break
                 color = colors[y][x] % len(self.color_list)
-                alive = self.color_list[color] + alive + self.color_list[0]
+                alive = self.color_list[color] + display + self.color_list[0]
                 cells += alive if world[y][x] else '  '
             line += ['│' + cells + '│']
         print('\n'.join(line))
