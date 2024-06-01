@@ -240,3 +240,18 @@ class TestGameOfLife(unittest.TestCase):
         for i in range(4):
             game.update()
         self.assertEqual(game.ages, expected)
+
+    def test_tree_elp(self):
+        import time
+        start = time.perf_counter()
+
+        setting = {}
+        setting['sample'] = 'tree'
+        setting['mortal'] = True
+        setting['color'] = True
+        GameOfLife(**setting).start()
+
+        end = time.perf_counter()
+        elp = end - start
+        print(f'\n[elp : {elp:.3f}(s)]')
+        self.assertLessEqual(elp, 10*1.1)
