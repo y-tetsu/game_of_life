@@ -60,7 +60,12 @@ class GameOfLife:
         self.colors = [[0 for _ in row] for row in self.world]
         if colors:
             self.colors = colors
-        self.console = Console(self.x, self.y, self.name, self.alive)
+
+        self.alives = (('  ', 0), (self.alive, 10), ('□', 30), ('・', 60))
+        self.lifespans = [alive[1] for alive in self.alives]
+        self.marks = [alive[0] for alive in self.alives]
+
+        self.console = Console(self.x, self.y, self.name, self.marks)
 
         if rand:
             self.dump()
@@ -99,7 +104,7 @@ class GameOfLife:
             self.console.setup()
             while True:
                 self.console.display(self.world, self.step,
-                                     self.ages, self.colors)
+                                     self.colors)
                 if not self.loop and self.step == self.max_step:
                     break
                 if self.step == 1:
@@ -120,8 +125,13 @@ class GameOfLife:
                 if new_cell:
                     if self.mortal:
                         if self.world[y][x]:
+                            # ageing
                             self.ages[y][x] += 1
-                            if self.ages[y][x] > 60:
+                            for index, lifespan in enumerate(self.lifespans):
+                                if self.ages[y][x] < lifespan:
+                                    new_cell = index
+                                    break
+                            else:
                                 self.ages[y][x] = 0
                                 new_cell = 0
                         else:
@@ -171,7 +181,7 @@ class GameOfLife:
             'step': self.max_step,
             'wait': self.wait_time,
             'delay': self.delay,
-            'alive': self.console.alive,
+            'alive': self.alive,
             'ratio': self.ratio,
             'loop': self.loop,
             'torus': self.torus,
@@ -188,11 +198,11 @@ class GameOfLife:
 
 
 class Console:
-    def __init__(self, x, y, name, alive):
+    def __init__(self, x, y, name, marks):
         self.x = x
         self.y = y
         self.name = name
-        self.alive = alive
+        self.marks = marks
         if 'win' in system().lower():
             self.enable_win_escape_code()
         self.color_list = [
@@ -231,31 +241,25 @@ class Console:
     def cursor_up(self, n):
         print(f'\033[{n}A', end='')
 
-    def display(self, world, step, ages, colors):
+    def display(self, world, step, colors):
         if step > 1:
             self.cursor_up(self.y + 4)
         self.display_title()
-        self.display_world(world, ages, colors)
+        self.display_world(world, colors)
         self.display_step(step)
 
     def display_title(self):
         print(f'{self.name} ({self.x} x {self.y})')
 
-    def display_world(self, world, ages, colors):
+    def display_world(self, world, colors):
         print('┌' + '─' * (self.x * 2) + '┐')
         line = []
-        alives = ((self.alive, 10), ('□', 30), ('・', 60))
         for y in range(self.y):
             cells = ''
             for x in range(self.x):
-                display = None
-                for alive in alives:
-                    if ages[y][x] <= alive[1]:
-                        display = alive[0]
-                        break
                 color = colors[y][x] % len(self.color_list)
-                alive = self.color_list[color] + display + self.color_list[0]
-                cells += alive if world[y][x] else '  '
+                mark = self.marks[world[y][x]]
+                cells += self.color_list[color] + mark + self.color_list[0]
             line += ['│' + cells + '│']
         print('\n'.join(line))
         print('└' + '─' * (self.x * 2) + '┘')
