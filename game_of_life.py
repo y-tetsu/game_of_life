@@ -17,7 +17,7 @@ class GameOfLife:
         self.x = x
         self.y = y
         rand = False
-        samples = self.load_samples('samples.json')
+        samples = self._load_samples('samples.json')
         colors = None
         if sample in samples:
             self.name = sample
@@ -48,7 +48,7 @@ class GameOfLife:
 
         if json_file is not None:
             rand = False
-            self.load(json_file)
+            self._load(json_file)
 
         self.dirs = [
             (-1, -1), (0, -1), (1, -1),
@@ -68,9 +68,25 @@ class GameOfLife:
         self.console = Console(self.x, self.y, self.name, self.marks)
 
         if rand:
-            self.dump()
+            self._dump()
 
-    def load_samples(self, samples_file):
+    def start(self):
+        try:
+            self.console.setup()
+            while True:
+                self.console.display(self.world, self.step, self.colors)
+                if not self.loop and self.step == self.max_step:
+                    break
+                if self.step == 1:
+                    time.sleep(self.delay)
+                self._update()
+                self._wait()
+        except KeyboardInterrupt:
+            return
+        finally:
+            self.console.teardown()
+
+    def _load_samples(self, samples_file):
         samples = {}
         try:
             with open(samples_file, 'r') as f:
@@ -79,7 +95,7 @@ class GameOfLife:
             pass
         return samples
 
-    def load(self, json_file):
+    def _load(self, json_file):
         try:
             with open(json_file, 'r') as f:
                 settings = json.load(f)
@@ -99,53 +115,41 @@ class GameOfLife:
         except FileNotFoundError:
             pass
 
-    def start(self):
-        try:
-            self.console.setup()
-            while True:
-                self.console.display(self.world, self.step,
-                                     self.colors)
-                if not self.loop and self.step == self.max_step:
-                    break
-                if self.step == 1:
-                    time.sleep(self.delay)
-                self.update()
-                self.wait()
-        except KeyboardInterrupt:
-            return
-        finally:
-            self.console.teardown()
-
-    def update(self):
+    def _update(self):
         new_world = []
-        for y in range(self.y):
-            new_cells = []
-            for x in range(self.x):
-                new_cell = self.new_cell(x, y)
-                if new_cell:
-                    if self.mortal:
-                        if self.world[y][x]:
-                            # ageing
-                            self.ages[y][x] += 1
-                            for index, lifespan in enumerate(self.lifespans):
-                                if self.ages[y][x] < lifespan:
-                                    new_cell = index
-                                    break
-                            else:
-                                self.ages[y][x] = 0
-                                new_cell = 0
-                        else:
-                            self.ages[y][x] = 1
+        max_y, max_x = self.y, self.x
+        world, ages, colors = self.world, self.ages, self.colors
+        for y in range(max_y):
+            new_cells = [cell for cell in world[y]]
+            for x in range(max_x):
+                if new_cell := self._new_cell(x, y):
+                    if world[y][x]:
+                        # if mortal option is enabled, cells are ageing.
+                        if self.mortal:
+                            new_cell = self._ageing(x, y, new_cell)
+                    else:
+                        ages[y][x] = 1
                 else:
-                    self.ages[y][x] = 0
-                    self.colors[y][x] = 0
-                new_cells += [new_cell]
+                    ages[y][x] = 0
+                    colors[y][x] = 0
+                new_cells[x] = new_cell
             new_world += [new_cells]
         self.world = [[x for x in row] for row in new_world]
         self.step += 1
 
-    def new_cell(self, x, y):
-        alive, color = self.count_alive(x, y)
+    def _ageing(self, x, y, cell):
+        self.ages[y][x] += 1
+        for index, lifespan in enumerate(self.lifespans):
+            if self.ages[y][x] < lifespan:
+                cell = index
+                break
+        else:
+            self.ages[y][x] = 0
+            cell = 0
+        return cell
+
+    def _new_cell(self, x, y):
+        alive, color = self._count_alive(x, y)
         if self.world[y][x]:
             return 1 if alive == 2 or alive == 3 else 0
         if alive == 3:
@@ -154,7 +158,7 @@ class GameOfLife:
             return 1
         return 0
 
-    def count_alive(self, x, y):
+    def _count_alive(self, x, y):
         alive, color = 0, 0
         for dx, dy in self.dirs:
             next_x, next_y = x + dx, y + dy
@@ -167,10 +171,10 @@ class GameOfLife:
                     alive += 1
         return alive, color
 
-    def wait(self):
+    def _wait(self):
         time.sleep(self.wait_time)
 
-    def dump(self):
+    def _dump(self):
         now = datetime.now().strftime('%Y%m%d%H%M%S')
         json_file = 'world' + now + '.json'
         settings = {
@@ -204,7 +208,7 @@ class Console:
         self.name = name
         self.marks = marks
         if 'win' in system().lower():
-            self.enable_win_escape_code()
+            self._enable_win_escape_code()
         self.color_list = [
             '\x1b[39m',                # 0: default
             '\033[38;2;255;255;255m',  # 1: white
@@ -218,53 +222,57 @@ class Console:
             '\033[38;2;146;7;131m',    # 9: purple
         ]
 
-    def enable_win_escape_code(self):
+    def _enable_win_escape_code(self):
         kernel = windll.kernel32
         kernel.SetConsoleMode(kernel.GetStdHandle(-11), 7)
 
     def setup(self):
-        self.clear_screen()
-        self.cursor_hyde()
+        self._clear_screen()
+        self._cursor_hyde()
 
     def teardown(self):
-        self.cursor_show()
-
-    def clear_screen(self):
-        print("\033[;H\033[2J")
-
-    def cursor_hyde(self):
-        print('\033[?25l', end='')
-
-    def cursor_show(self):
-        print('\033[?25h', end='')
-
-    def cursor_up(self, n):
-        print(f'\033[{n}A', end='')
+        self._cursor_show()
 
     def display(self, world, step, colors):
         if step > 1:
-            self.cursor_up(self.y + 4)
-        self.display_title()
-        self.display_world(world, colors)
-        self.display_step(step)
+            self._cursor_up(self.y + 4)
+        self._display_title()
+        self._display_world(world, colors)
+        self._display_step(step)
 
-    def display_title(self):
+    def _clear_screen(self):
+        print("\033[;H\033[2J")
+
+    def _cursor_hyde(self):
+        print('\033[?25l', end='')
+
+    def _cursor_show(self):
+        print('\033[?25h', end='')
+
+    def _cursor_up(self, n):
+        print(f'\033[{n}A', end='')
+
+    def _display_title(self):
         print(f'{self.name} ({self.x} x {self.y})')
 
-    def display_world(self, world, colors):
-        print('┌' + '─' * (self.x * 2) + '┐')
+    def _display_world(self, world, colors):
+        color_list = self.color_list
+        marks = self.marks
+        max_y, max_x = self.y, self.x
+        max_color = len(color_list)
         line = []
-        for y in range(self.y):
+        # display world on cli
+        print('┌' + '─' * (max_x * 2) + '┐')
+        for y in range(max_y):
             cells = ''
-            for x in range(self.x):
-                color = colors[y][x] % len(self.color_list)
-                mark = self.marks[world[y][x]]
-                cells += self.color_list[color] + mark + self.color_list[0]
+            for x in range(max_x):
+                color = colors[y][x] % max_color
+                cells += color_list[color] + marks[world[y][x]] + color_list[0]
             line += ['│' + cells + '│']
         print('\n'.join(line))
-        print('└' + '─' * (self.x * 2) + '┘')
+        print('└' + '─' * (max_x * 2) + '┘')
 
-    def display_step(self, step):
+    def _display_step(self, step):
         print(f'step = {step}')
 
 
