@@ -313,7 +313,7 @@ if __name__ == '__main__':
         setting['json_file'] = args.json
     if args.step:
         setting['max_step'] = args.step
-    if args.wait:
+    if args.wait is not None:
         setting['wait_time'] = args.wait
     if args.delay:
         setting['delay'] = args.delay
