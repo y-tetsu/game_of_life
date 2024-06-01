@@ -257,7 +257,13 @@ class Console:
         print(f'\033[{n}A', end='')
 
     def _display_title(self):
-        print(f'{self.name} ({self.x} x {self.y})')
+        name, x, y = self.name, self.x, self.y
+        count = x * y
+        max_cell_size = 1365
+        msg = f'{name} ({x} x {y})'
+        if count > max_cell_size:
+            msg += f' * warning : max_cell_size({max_cell_size}) is over! *'
+        print(msg)
 
     def _display_world(self, world, colors):
         color_list = self.color_list

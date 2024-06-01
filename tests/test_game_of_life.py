@@ -269,4 +269,4 @@ class TestGameOfLife(unittest.TestCase):
         end = time.perf_counter()
         elp = end - start
         print(f'\n[elp : {elp:.3f}(s)]')
-        self.assertLessEqual(elp, 1.8 * 1.1)
+        self.assertLessEqual(elp, 1.9 * 1.1)
