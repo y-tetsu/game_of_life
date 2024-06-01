@@ -160,11 +160,13 @@ class GameOfLife:
 
     def _count_alive(self, x, y):
         max_x, max_y = self.x, self.y
-        world, colors = self.world, self.colors
+        world, colors, torus = self.world, self.colors, self.torus
         alive, color = 0, 0
         for dx, dy in self.dirs:
             next_x, next_y = x + dx, y + dy
-            if self.torus:
+            # if torus option is enabled,
+            # top and bottom, left and right are connected.
+            if torus:
                 next_x %= max_x
                 next_y %= max_y
             if (0 <= next_x < max_x) and (0 <= next_y < max_y):
