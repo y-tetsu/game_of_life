@@ -241,6 +241,19 @@ class TestGameOfLife(unittest.TestCase):
             game._update()
         self.assertEqual(game.ages, expected)
 
+    def test_glider_elp(self):
+        import time
+        start = time.perf_counter()
+
+        setting = {}
+        setting['sample'] = 'glider'
+        GameOfLife(**setting).start()
+
+        end = time.perf_counter()
+        elp = end - start
+        print(f'\n[elp : {elp:.3f}(s)]')
+        self.assertLessEqual(elp, 4 * 1.1)
+
     def test_tree_elp(self):
         import time
         start = time.perf_counter()
