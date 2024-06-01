@@ -159,15 +159,17 @@ class GameOfLife:
         return 0
 
     def _count_alive(self, x, y):
+        max_x, max_y = self.x, self.y
+        world, colors = self.world, self.colors
         alive, color = 0, 0
         for dx, dy in self.dirs:
             next_x, next_y = x + dx, y + dy
             if self.torus:
-                next_x %= self.x
-                next_y %= self.y
-            if (0 <= next_x < self.x) and (0 <= next_y < self.y):
-                color = max(color, self.colors[next_y][next_x])
-                if self.world[next_y][next_x]:
+                next_x %= max_x
+                next_y %= max_y
+            if (0 <= next_x < max_x) and (0 <= next_y < max_y):
+                color = max(color, colors[next_y][next_x])
+                if world[next_y][next_x]:
                     alive += 1
         return alive, color
 
