@@ -12,7 +12,7 @@ class TestGameOfLife(unittest.TestCase):
         self.assertEqual(len(game.world[0]), 30)
         self.assertEqual(len(game.world), 15)
         self.assertEqual(game.max_step, 100)
-        self.assertEqual(game.wait_time, 0.05)
+        self.assertEqual(game.wait_time, 0.03)
         self.assertEqual(game.delay, 0.0)
         self.assertEqual(game.alive, '■')
         self.assertEqual(game.ratio, 0.5)

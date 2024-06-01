@@ -9,7 +9,7 @@ import pprint
 
 class GameOfLife:
     def __init__(self, sample=None, name='game_of_life', x=30, y=15,
-                 world=None, max_step=None, wait_time=0.05, delay=0.0,
+                 world=None, max_step=None, wait_time=0.03, delay=0.0,
                  alive='■', ratio=0.5, loop=False, torus=False, mortal=False,
                  color=False, json_file=None):
         self.sample = sample
