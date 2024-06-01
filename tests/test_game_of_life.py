@@ -247,12 +247,13 @@ class TestGameOfLife(unittest.TestCase):
 
         setting = {}
         setting['sample'] = 'glider'
+        setting['wait_time'] = 0.0
         GameOfLife(**setting).start()
 
         end = time.perf_counter()
         elp = end - start
         print(f'\n[elp : {elp:.3f}(s)]')
-        self.assertLessEqual(elp, 4 * 1.1)
+        self.assertLessEqual(elp, 0.4 * 1.1)
 
     def test_tree_elp(self):
         import time
@@ -262,9 +263,10 @@ class TestGameOfLife(unittest.TestCase):
         setting['sample'] = 'tree'
         setting['mortal'] = True
         setting['color'] = True
+        setting['wait_time'] = 0.0
         GameOfLife(**setting).start()
 
         end = time.perf_counter()
         elp = end - start
         print(f'\n[elp : {elp:.3f}(s)]')
-        self.assertLessEqual(elp, 10 * 1.1)
+        self.assertLessEqual(elp, 1.8 * 1.1)
