@@ -234,19 +234,6 @@ class Console:
         ]
         self.title = self._setup_title()
 
-    def _enable_win_escape_code(self):
-        kernel = windll.kernel32
-        kernel.SetConsoleMode(kernel.GetStdHandle(-11), 7)
-
-    def _setup_title(self):
-        name, x, y = self.name, self.x, self.y
-        count = x * y
-        max_cell_size = 1365
-        title = f'{name} ({x} x {y})'
-        if count > max_cell_size:
-            title += f' * warning : max_cell_size({max_cell_size}) is over! *'
-        return title
-
     def setup(self):
         self._clear_screen()
         self._cursor_hyde()
@@ -257,9 +244,14 @@ class Console:
     def display(self, world, step, colors):
         if step > 1:
             self._cursor_up(self.y + 4)
-        self._display_title()
-        self._display_world(world, colors)
-        self._display_step(step)
+        screen = self._get_title()
+        screen += self._get_world(world, colors)
+        screen += self._get_step(step)
+        print(screen, end='')
+
+    def _enable_win_escape_code(self):
+        kernel = windll.kernel32
+        kernel.SetConsoleMode(kernel.GetStdHandle(-11), 7)
 
     def _clear_screen(self):
         print("\033[;H\033[2J")
@@ -273,28 +265,38 @@ class Console:
     def _cursor_up(self, n):
         print(f'\033[{n}A', end='')
 
-    def _display_title(self):
-        print(self.title)
+    def _setup_title(self):
+        name, x, y = self.name, self.x, self.y
+        count = x * y
+        max_cell_size = 1365
+        title = f'{name} ({x} x {y})'
+        if count > max_cell_size:
+            title += f' * warning : max_cell_size({max_cell_size}) is over! *'
+        return title
 
-    def _display_world(self, world, colors):
+    def _get_title(self):
+        return f"{self.title}\n"
+
+    def _get_world(self, world, colors):
         color_list = self.color_list
         marks = self.marks
         max_y, max_x = self.y, self.x
         max_color = len(color_list)
         line = []
-        # display world on cli
-        print('┌' + '─' * (max_x * 2) + '┐')
+        # setup screen for display world on cli
+        screen = '┌' + ('─' * (max_x * 2)) + '┐\n'
         for y in range(max_y):
             cells = ''
             for x in range(max_x):
                 color = colors[y][x] % max_color
                 cells += color_list[color] + marks[world[y][x]] + color_list[0]
             line += ['│' + cells + '│']
-        print('\n'.join(line))
-        print('└' + '─' * (max_x * 2) + '┘')
+        screen += '\n'.join(line) + '\n'
+        screen += '└' + ('─' * (max_x * 2)) + '┘\n'
+        return screen
 
-    def _display_step(self, step):
-        print(f'step = {step}')
+    def _get_step(self, step):
+        return f'step = {step}\n'
 
 
 if __name__ == '__main__':
