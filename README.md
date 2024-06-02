@@ -71,3 +71,11 @@ py game_of_life.py glider-gun -c
 ```
 py game_of_life.py die-hard
 ```
+
+### エデンの園配置型
+#### エデンの園(1971年)
+<img src="images/eden1971.gif" width="450px">
+
+```
+py game_of_life.py eden1971 -d 2 -w 0.5
+```
