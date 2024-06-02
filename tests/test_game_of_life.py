@@ -61,7 +61,7 @@ class TestGameOfLife(unittest.TestCase):
         self.assertEqual(game.mortal, mortal)
         self.assertEqual(game.color, color)
 
-    def test_count_alive(self):
+    def test_get_around(self):
         world = [
             [1, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0],
@@ -71,17 +71,17 @@ class TestGameOfLife(unittest.TestCase):
             [1, 1, 1, 1, 1, 1, 1, 1],
         ]
         game = GameOfLife(world=world)
-        self.assertEqual(game._count_alive(0, 0), (0, 0))
-        self.assertEqual(game._count_alive(0, 2), (1, 0))
-        self.assertEqual(game._count_alive(0, 3), (2, 0))
-        self.assertEqual(game._count_alive(0, 4), (3, 0))
-        self.assertEqual(game._count_alive(1, 5), (4, 0))
-        self.assertEqual(game._count_alive(3, 5), (5, 0))
-        self.assertEqual(game._count_alive(2, 4), (6, 0))
-        self.assertEqual(game._count_alive(4, 4), (7, 0))
-        self.assertEqual(game._count_alive(6, 4), (8, 0))
+        self.assertEqual(game._get_around(0, 0), (0, 0))
+        self.assertEqual(game._get_around(0, 2), (1, 0))
+        self.assertEqual(game._get_around(0, 3), (2, 0))
+        self.assertEqual(game._get_around(0, 4), (3, 0))
+        self.assertEqual(game._get_around(1, 5), (4, 0))
+        self.assertEqual(game._get_around(3, 5), (5, 0))
+        self.assertEqual(game._get_around(2, 4), (6, 0))
+        self.assertEqual(game._get_around(4, 4), (7, 0))
+        self.assertEqual(game._get_around(6, 4), (8, 0))
 
-    def test_count_alive_torus(self):
+    def test_get_around_torus(self):
         world = [
             [1, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0],
@@ -91,17 +91,17 @@ class TestGameOfLife(unittest.TestCase):
             [1, 1, 1, 1, 1, 1, 1, 1],
         ]
         game = GameOfLife(world=world, torus=True)
-        self.assertEqual(game._count_alive(0, 0), (3, 0))
-        self.assertEqual(game._count_alive(0, 2), (2, 0))
-        self.assertEqual(game._count_alive(0, 3), (4, 0))
-        self.assertEqual(game._count_alive(0, 4), (6, 0))
-        self.assertEqual(game._count_alive(1, 5), (5, 0))
-        self.assertEqual(game._count_alive(3, 5), (5, 0))
-        self.assertEqual(game._count_alive(2, 4), (6, 0))
-        self.assertEqual(game._count_alive(4, 4), (7, 0))
-        self.assertEqual(game._count_alive(6, 4), (8, 0))
+        self.assertEqual(game._get_around(0, 0), (3, 0))
+        self.assertEqual(game._get_around(0, 2), (2, 0))
+        self.assertEqual(game._get_around(0, 3), (4, 0))
+        self.assertEqual(game._get_around(0, 4), (6, 0))
+        self.assertEqual(game._get_around(1, 5), (5, 0))
+        self.assertEqual(game._get_around(3, 5), (5, 0))
+        self.assertEqual(game._get_around(2, 4), (6, 0))
+        self.assertEqual(game._get_around(4, 4), (7, 0))
+        self.assertEqual(game._get_around(6, 4), (8, 0))
 
-    def test_count_alive_color(self):
+    def test_get_around_color(self):
         world = [
             [1, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0],
@@ -120,10 +120,10 @@ class TestGameOfLife(unittest.TestCase):
         ]
         game = GameOfLife(world=world, torus=True, color=True)
         game.colors = colors
-        self.assertEqual(game._count_alive(0, 0), (3, 2))
-        self.assertEqual(game._count_alive(3, 5), (5, 8))
+        self.assertEqual(game._get_around(0, 0), (3, 2))
+        self.assertEqual(game._get_around(3, 5), (5, 8))
 
-    def test_new_cell_from_alive(self):
+    def test_next_cell_from_alive(self):
         world = [
             [1, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0],
@@ -133,17 +133,17 @@ class TestGameOfLife(unittest.TestCase):
             [1, 1, 1, 1, 1, 1, 1, 1],
         ]
         game = GameOfLife(world=world)
-        self.assertEqual(game._new_cell(0, 0), 0)  # alive=0 to dead
-        self.assertEqual(game._new_cell(0, 2), 0)  # alive=1 to dead
-        self.assertEqual(game._new_cell(0, 3), 1)  # alive=2 keep
-        self.assertEqual(game._new_cell(0, 4), 1)  # alive=3 keep
-        self.assertEqual(game._new_cell(1, 5), 0)  # alive=4 to dead
-        self.assertEqual(game._new_cell(3, 5), 0)  # alive=5 to dead
-        self.assertEqual(game._new_cell(2, 4), 0)  # alive=6 to dead
-        self.assertEqual(game._new_cell(4, 4), 0)  # alive=7 to dead
-        self.assertEqual(game._new_cell(6, 4), 0)  # alive=8 to dead
+        self.assertEqual(game._next_cell(0, 0), 0)  # alive=0 to dead
+        self.assertEqual(game._next_cell(0, 2), 0)  # alive=1 to dead
+        self.assertEqual(game._next_cell(0, 3), 1)  # alive=2 keep
+        self.assertEqual(game._next_cell(0, 4), 1)  # alive=3 keep
+        self.assertEqual(game._next_cell(1, 5), 0)  # alive=4 to dead
+        self.assertEqual(game._next_cell(3, 5), 0)  # alive=5 to dead
+        self.assertEqual(game._next_cell(2, 4), 0)  # alive=6 to dead
+        self.assertEqual(game._next_cell(4, 4), 0)  # alive=7 to dead
+        self.assertEqual(game._next_cell(6, 4), 0)  # alive=8 to dead
 
-    def test_new_cell_from_dead(self):
+    def test_next_cell_from_dead(self):
         world = [
             [0, 0, 1, 1, 1, 1],
             [0, 0, 0, 1, 1, 1],
@@ -153,15 +153,15 @@ class TestGameOfLife(unittest.TestCase):
             [1, 1, 0, 1, 1, 1],
         ]
         game = GameOfLife(world=world)
-        self.assertEqual(game._new_cell(0, 0), 0)  # dead=0 keep
-        self.assertEqual(game._new_cell(0, 1), 0)  # dead=1 keep
-        self.assertEqual(game._new_cell(0, 2), 0)  # dead=2 keep
-        self.assertEqual(game._new_cell(0, 3), 1)  # dead=3 to alive
-        self.assertEqual(game._new_cell(0, 4), 0)  # dead=4 keep
-        self.assertEqual(game._new_cell(2, 1), 0)  # dead=5 keep
-        self.assertEqual(game._new_cell(2, 2), 0)  # dead=6 keep
-        self.assertEqual(game._new_cell(2, 4), 0)  # dead=7 keep
-        self.assertEqual(game._new_cell(4, 4), 0)  # dead=8 keep
+        self.assertEqual(game._next_cell(0, 0), 0)  # dead=0 keep
+        self.assertEqual(game._next_cell(0, 1), 0)  # dead=1 keep
+        self.assertEqual(game._next_cell(0, 2), 0)  # dead=2 keep
+        self.assertEqual(game._next_cell(0, 3), 1)  # dead=3 to alive
+        self.assertEqual(game._next_cell(0, 4), 0)  # dead=4 keep
+        self.assertEqual(game._next_cell(2, 1), 0)  # dead=5 keep
+        self.assertEqual(game._next_cell(2, 2), 0)  # dead=6 keep
+        self.assertEqual(game._next_cell(2, 4), 0)  # dead=7 keep
+        self.assertEqual(game._next_cell(4, 4), 0)  # dead=8 keep
 
     def test_update(self):
         world = [

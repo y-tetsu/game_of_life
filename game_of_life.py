@@ -75,8 +75,10 @@ class GameOfLife:
             self.console.setup()
             while True:
                 self.console.display(self.world, self.step, self.colors)
-                if not self.loop and self.step == self.max_step:
-                    break
+                if self.step == self.max_step:
+                    if not self.loop:
+                        # if loop option is enabled, game_of_life is never end.
+                        break
                 if self.step == 1:
                     time.sleep(self.delay)
                 self._update()
@@ -116,24 +118,24 @@ class GameOfLife:
             pass
 
     def _update(self):
-        new_world = []
         max_y, max_x = self.y, self.x
-        world, ages, colors = self.world, self.ages, self.colors
+        world, colors = self.world, self.colors
+        mortal, ages = self.mortal, self.ages
+        new_world = []
         for y in range(max_y):
-            new_cells = [cell for cell in world[y]]
+            next_cells = []
             for x in range(max_x):
-                if new_cell := self._new_cell(x, y):
-                    if world[y][x]:
-                        # if mortal option is enabled, cells are ageing.
-                        if self.mortal:
-                            new_cell = self._ageing(x, y, new_cell)
-                    else:
-                        ages[y][x] = 1
+                if next_cell := self._next_cell(x, y):
+                    if mortal:
+                        # if mortal option is enabled, living cells are ageing.
+                        if world[y][x]:
+                            next_cell = self._ageing(x, y, next_cell)
+                        else:
+                            ages[y][x] = 1
                 else:
-                    ages[y][x] = 0
-                    colors[y][x] = 0
-                new_cells[x] = new_cell
-            new_world += [new_cells]
+                    ages[y][x], colors[y][x] = 0, 0
+                next_cells += [next_cell]
+            new_world += [next_cells]
         self.world = [[x for x in row] for row in new_world]
         self.step += 1
 
@@ -144,33 +146,38 @@ class GameOfLife:
                 cell = index
                 break
         else:
+            # lifespan has expired.
             self.ages[y][x] = 0
             cell = 0
         return cell
 
-    def _new_cell(self, x, y):
-        alive, color = self._count_alive(x, y)
+    def _next_cell(self, x, y):
+        alive, color = self._get_around(x, y)
         if self.world[y][x]:
             return 1 if alive == 2 or alive == 3 else 0
         if alive == 3:
             if self.color:
+                # if color option is enabled,
+                # the new cell evolves from the most evolved cell around it.
                 self.colors[y][x] = color + 1
             return 1
         return 0
 
-    def _count_alive(self, x, y):
+    def _get_around(self, x, y):
         max_x, max_y = self.x, self.y
         world, colors, torus = self.world, self.colors, self.torus
         alive, color = 0, 0
         for dx, dy in self.dirs:
             next_x, next_y = x + dx, y + dy
-            # if torus option is enabled,
-            # top and bottom, left and right are connected.
             if torus:
-                next_x %= max_x
-                next_y %= max_y
+                # if torus option is enabled,
+                # top and bottom, left and right are connected.
+                next_x, next_y = next_x % max_x, next_y % max_y
             if (0 <= next_x < max_x) and (0 <= next_y < max_y):
-                color = max(color, colors[next_y][next_x])
+                if self.color:
+                    # if color option is enabled,
+                    # the color of most evolved cell around it is inherited.
+                    color = max(color, colors[next_y][next_x])
                 if world[next_y][next_x]:
                     alive += 1
         return alive, color
@@ -225,10 +232,20 @@ class Console:
             '\033[38;2;240;131;0m',    # 8: orange
             '\033[38;2;146;7;131m',    # 9: purple
         ]
+        self.title = self._setup_title()
 
     def _enable_win_escape_code(self):
         kernel = windll.kernel32
         kernel.SetConsoleMode(kernel.GetStdHandle(-11), 7)
+
+    def _setup_title(self):
+        name, x, y = self.name, self.x, self.y
+        count = x * y
+        max_cell_size = 1365
+        title = f'{name} ({x} x {y})'
+        if count > max_cell_size:
+            title += f' * warning : max_cell_size({max_cell_size}) is over! *'
+        return title
 
     def setup(self):
         self._clear_screen()
@@ -257,13 +274,7 @@ class Console:
         print(f'\033[{n}A', end='')
 
     def _display_title(self):
-        name, x, y = self.name, self.x, self.y
-        count = x * y
-        max_cell_size = 1365
-        msg = f'{name} ({x} x {y})'
-        if count > max_cell_size:
-            msg += f' * warning : max_cell_size({max_cell_size}) is over! *'
-        print(msg)
+        print(self.title)
 
     def _display_world(self, world, colors):
         color_list = self.color_list
