@@ -268,7 +268,7 @@ class Console:
     def _setup_title(self):
         name, x, y = self.name, self.x, self.y
         count = x * y
-        max_cell_size = 1140
+        max_cell_size = 2000
         title = f'{name} ({x} x {y})'
         if count > max_cell_size:
             title += f' * warning : max_cell_size({max_cell_size}) is over! *'
@@ -288,8 +288,11 @@ class Console:
         for y in range(max_y):
             cells = ''
             for x in range(max_x):
-                color = colors[y][x] % max_color
-                cells += color_list[color] + marks[world[y][x]] + color_list[0]
+                mark = marks[world[y][x]]
+                if color := colors[y][x] % max_color:
+                    cells += color_list[color] + mark + color_list[0]
+                else:
+                    cells += mark
             line += ['│' + cells + '│']
         screen += '\n'.join(line) + '\n'
         screen += '└' + ('─' * (max_x * 2)) + '┘\n'
