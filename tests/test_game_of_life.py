@@ -264,9 +264,10 @@ class TestGameOfLife(unittest.TestCase):
         setting['mortal'] = True
         setting['color'] = True
         setting['wait_time'] = 0.0
-        GameOfLife(**setting).start()
+        for _ in range(5):
+            GameOfLife(**setting).start()
 
         end = time.perf_counter()
         elp = end - start
         print(f'\n[elp : {elp:.3f}(s)]')
-        self.assertLessEqual(elp, 1.6 * 1.1)
+        self.assertLessEqual(elp, 4.5 * 1.1)
