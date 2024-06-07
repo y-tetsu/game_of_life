@@ -177,7 +177,9 @@ class GameOfLife:
                 if self.color:
                     # if color option is enabled,
                     # the color of most evolved cell around it is inherited.
-                    color = max(color, colors[next_y][next_x])
+                    next_color = colors[next_y][next_x]
+                    if next_color > color:
+                        color = next_color
                 if world[next_y][next_x]:
                     alive += 1
         return alive, color
