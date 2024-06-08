@@ -289,14 +289,29 @@ class Console:
         # setup screen for display world on cli
         screen = '┌' + ('─' * (max_x * 2)) + '┐\n'
         for y in range(max_y):
-            cells = ''
+            cells, pre_color = '', 0
             for x in range(max_x):
                 mark = marks[world[y][x]]
-                if color := colors[y][x] % max_color:
-                    cells += color_list[color] + mark + color_list[0]
-                else:
+                if mark == '  ':
+                    # if no mark, color must be not care
                     cells += mark
-            line += ['│' + cells + '│']
+                else:
+                    # change color if it is different from previous
+                    if color := colors[y][x] % max_color:
+                        if color == pre_color:
+                            cells += mark
+                        else:
+                            cells += color_list[color] + mark
+                    else:
+                        if pre_color:
+                            cells += color_list[0] + mark
+                        else:
+                            cells += mark
+                    pre_color = color
+            if pre_color:
+                line += ['│' + cells + color_list[0] + '│']
+            else:
+                line += ['│' + cells + '│']
         screen += '\n'.join(line) + '\n'
         screen += '└' + ('─' * (max_x * 2)) + '┘\n'
         return screen
