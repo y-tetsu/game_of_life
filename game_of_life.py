@@ -169,17 +169,18 @@ class GameOfLife:
         alive, color = 0, 0
         for dx, dy in self.dirs:
             next_x, next_y = x + dx, y + dy
+            calc = False
             if torus:
                 # if torus option is enabled,
                 # top and bottom, left and right are connected.
                 next_x, next_y = next_x % max_x, next_y % max_y
-            if (0 <= next_x < max_x) and (0 <= next_y < max_y):
-                if self.color:
-                    # if color option is enabled,
-                    # the color of most evolved cell around it is inherited.
-                    next_color = colors[next_y][next_x]
-                    if next_color > color:
-                        color = next_color
+                calc = True
+            else:
+                calc = (0 <= next_x < max_x) and (0 <= next_y < max_y)
+            if calc:
+                next_color = colors[next_y][next_x]
+                if next_color > color:
+                    color = next_color
                 if world[next_y][next_x]:
                     alive += 1
         return alive, color
