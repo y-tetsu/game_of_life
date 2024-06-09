@@ -12,7 +12,7 @@ class TestGameOfLife(unittest.TestCase):
         self.assertEqual(len(game.world[0]), 30)
         self.assertEqual(len(game.world), 15)
         self.assertEqual(game.max_step, 100)
-        self.assertEqual(game.wait_time, 0.03)
+        self.assertEqual(game.wait, 0.03)
         self.assertEqual(game.delay, 0.0)
         self.assertEqual(game.alive, '■')
         self.assertEqual(game.ratio, 0.5)
@@ -34,7 +34,7 @@ class TestGameOfLife(unittest.TestCase):
         sample = 'test'
         name = 'test'
         max_step = 10
-        wait_time = 0.5
+        wait = 0.5
         delay = 0.5
         alive = '★'
         ratio = 0.9
@@ -43,7 +43,7 @@ class TestGameOfLife(unittest.TestCase):
         mortal = True
         color = True
         game = GameOfLife(sample=sample, name=name, world=world,
-                          max_step=max_step, wait_time=wait_time, delay=delay,
+                          max_step=max_step, wait=wait, delay=delay,
                           alive=alive, ratio=ratio, loop=loop, torus=torus,
                           mortal=mortal, color=color)
         self.assertEqual(game.sample, sample)
@@ -52,7 +52,7 @@ class TestGameOfLife(unittest.TestCase):
         self.assertEqual(game.y, y)
         self.assertEqual(game.world, world)
         self.assertEqual(game.max_step, max_step)
-        self.assertEqual(game.wait_time, wait_time)
+        self.assertEqual(game.wait, wait)
         self.assertEqual(game.delay, delay)
         self.assertEqual(game.alive, alive)
         self.assertEqual(game.ratio, ratio)
@@ -247,7 +247,7 @@ class TestGameOfLife(unittest.TestCase):
 
         setting = {}
         setting['sample'] = 'glider'
-        setting['wait_time'] = 0.0
+        setting['wait'] = 0.0
         GameOfLife(**setting).start()
 
         end = time.perf_counter()
@@ -264,7 +264,7 @@ class TestGameOfLife(unittest.TestCase):
         setting['torus'] = True
         setting['mortal'] = True
         setting['color'] = True
-        setting['wait_time'] = 0.0
+        setting['wait'] = 0.0
         for _ in range(3):
             GameOfLife(**setting).start()
 

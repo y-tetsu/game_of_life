@@ -9,7 +9,7 @@ import pprint
 
 class GameOfLife:
     def __init__(self, sample=None, name='game_of_life', x=30, y=15,
-                 world=None, max_step=None, wait_time=0.03, delay=0.0,
+                 world=None, max_step=None, wait=0.03, delay=0.0,
                  alive='■', ratio=0.5, loop=False, torus=False, mortal=False,
                  color=False, json_file=None):
         self.sample = sample
@@ -24,6 +24,8 @@ class GameOfLife:
                     max_step = samples[sample]['max_step']
             if 'colors' in samples[sample]:
                 colors = samples[sample]['colors']
+            if 'wait' in samples[sample]:
+                wait = samples[sample]['wait']
 
         self.x, self.y = x, y
         rand = False
@@ -37,7 +39,7 @@ class GameOfLife:
             ]
 
         self.max_step = max_step if max_step is not None else 100
-        self.wait_time = wait_time
+        self.wait = wait
         self.delay = delay
         self.alive = alive
         self.ratio = ratio
@@ -106,7 +108,7 @@ class GameOfLife:
                 self.y = settings['y']
                 self.world = settings['world']
                 self.max_step = settings['step']
-                self.wait_time = settings['wait']
+                self.wait = settings['wait']
                 self.delay = settings['delay']
                 self.alive = settings['alive']
                 self.ratio = settings['ratio']
@@ -187,7 +189,7 @@ class GameOfLife:
         return alive, color
 
     def _wait(self):
-        time.sleep(self.wait_time)
+        time.sleep(self.wait)
 
     def _dump(self):
         now = datetime.now().strftime('%Y%m%d%H%M%S')
@@ -198,7 +200,7 @@ class GameOfLife:
             'y': self.y,
             'world': self.world,
             'step': self.max_step,
-            'wait': self.wait_time,
+            'wait': self.wait,
             'delay': self.delay,
             'alive': self.alive,
             'ratio': self.ratio,
@@ -355,7 +357,7 @@ if __name__ == '__main__':
     if args.step:
         setting['max_step'] = args.step
     if args.wait is not None:
-        setting['wait_time'] = args.wait
+        setting['wait'] = args.wait
     if args.delay:
         setting['delay'] = args.delay
     if args.alive:
