@@ -14,11 +14,7 @@ class GameOfLife:
                  color=False, json_file=None):
         self.sample = sample
         self.name = name
-        self.x = x
-        self.y = y
-        rand = False
-        samples = self._load_samples('samples.json')
-        colors = None
+        samples, colors = self._load_samples('samples.json'), None
         if sample in samples:
             self.name = sample
             if 'world' in samples[sample]:
@@ -28,14 +24,18 @@ class GameOfLife:
                     max_step = samples[sample]['max_step']
             if 'colors' in samples[sample]:
                 colors = samples[sample]['colors']
+
+        self.x, self.y = x, y
+        rand = False
         if world is not None:
-            self.x = len(world[0])
-            self.y = len(world)
+            self.x, self.y = len(world[0]), len(world)
             self.world = [[x for x in row] for row in world]
         else:
             rand = True
-            self.world = [[1 if random() < ratio else 0 for _ in range(x)]
-                          for _ in range(y)]
+            self.world = [
+                [random() < ratio for _ in range(x)] for _ in range(y)
+            ]
+
         self.max_step = max_step if max_step is not None else 100
         self.wait_time = wait_time
         self.delay = delay
