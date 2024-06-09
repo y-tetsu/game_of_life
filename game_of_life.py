@@ -274,7 +274,7 @@ class Console:
     def _setup_title(self):
         name, x, y = self.name, self.x, self.y
         count = x * y
-        max_cell_size = 2800
+        max_cell_size = 3025
         title = f'{name} ({x} x {y})'
         if count > max_cell_size:
             title += f' * warning : max_cell_size({max_cell_size}) is over! *'
