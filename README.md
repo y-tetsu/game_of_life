@@ -68,6 +68,12 @@ py game_of_life.py glider-gun -c
 #### ダイハード
 <img src="images/die-hard.gif" width="450px">
 
+#### どんぐり
+<img src="images/acorn.gif" width="450px">
+
+#### ノアの方舟
+<img src="images/noahs-ark.gif" width="450px">
+
 ```
 py game_of_life.py die-hard
 ```
