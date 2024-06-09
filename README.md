@@ -68,14 +68,22 @@ py game_of_life.py glider-gun -c
 #### ダイハード
 <img src="images/die-hard.gif" width="450px">
 
+```
+py game_of_life.py die-hard
+```
+
 #### どんぐり
 <img src="images/acorn.gif" width="450px">
+
+```
+py game_of_life.py acorn -w 0
+```
 
 #### ノアの方舟
 <img src="images/noahs-ark.gif" width="450px">
 
 ```
-py game_of_life.py die-hard
+py game_of_life.py noahs-ark -d 0.5 -w 0
 ```
 
 ### エデンの園配置
