@@ -265,10 +265,27 @@ class TestGameOfLife(unittest.TestCase):
         setting['mortal'] = True
         setting['color'] = True
         setting['wait'] = 0.0
+        GameOfLife(**setting).start()
+
+        end = time.perf_counter()
+        elp = end - start
+        print(f'\n[elp : {elp:.3f}(s)]')
+        self.assertLessEqual(elp, 1.0 * 1.1)
+
+    def test_noahs_ark_elp(self):
+        import time
+        start = time.perf_counter()
+
+        setting = {}
+        setting['sample'] = 'noahs-ark'
+        setting['torus'] = True
+        setting['mortal'] = True
+        setting['color'] = True
+        setting['wait'] = 0.0
         for _ in range(3):
             GameOfLife(**setting).start()
 
         end = time.perf_counter()
         elp = end - start
         print(f'\n[elp : {elp:.3f}(s)]')
-        self.assertLessEqual(elp, 3.0 * 1.1)
+        self.assertLessEqual(elp, 15.0 * 1.1)
