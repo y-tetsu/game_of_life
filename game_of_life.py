@@ -5,6 +5,8 @@ from random import random
 from datetime import datetime
 import json
 import pprint
+import queue
+import threading
 
 
 class GameOfLife:
@@ -74,17 +76,30 @@ class GameOfLife:
 
     def start(self):
         try:
+            # 1st screen
             self.console.setup()
+            world, step, colors = self.world, self.step, self.colors
+            screen = self.console._get_screen(world, step, colors)
+            print(screen, end='')
+            if self.delay:
+                time.sleep(self.delay)
+
+            # thread setup
+            q = queue.Queue(1)
+            thread = threading.Thread(
+                    target=self._update, args=(q,), daemon=True)
+            thread.start()
+
+            # update screen
+            max_step, loop = self.max_step, self.loop
             while True:
-                self.console.display(self.world, self.step, self.colors)
-                if self.step == self.max_step:
-                    if not self.loop:
+                self._wait()
+                screen, step = q.get(timeout=0.5)
+                print(str(screen), end='')
+                if step >= max_step:
+                    if not loop:
                         # if loop option is enabled, game_of_life is never end.
                         break
-                if self.step == 1:
-                    time.sleep(self.delay)
-                self._update()
-                self._wait()
         except KeyboardInterrupt:
             return
         finally:
@@ -119,7 +134,14 @@ class GameOfLife:
         except FileNotFoundError:
             pass
 
-    def _update(self):
+    def _update(self, q):
+        while True:
+            self._next_step()
+            world, step, colors = self.world, self.step, self.colors
+            screen = self.console._get_screen(world, step, colors)
+            q.put((screen, step))
+
+    def _next_step(self):
         max_y, max_x = self.y, self.x
         world, colors = self.world, self.colors
         mortal, ages = self.mortal, self.ages
@@ -247,13 +269,14 @@ class Console:
     def teardown(self):
         self._cursor_show()
 
-    def display(self, world, step, colors):
+    def _get_screen(self, world, step, colors):
+        screen = ''
         if step > 1:
-            self._cursor_up(self.y + 4)
-        screen = self._get_title()
+            screen += self._cursor_up(self.y + 4)
+        screen += self._get_title()
         screen += self._get_world(world, colors)
         screen += self._get_step(step)
-        print(screen, end='')
+        return screen
 
     def _enable_win_escape_code(self):
         kernel = windll.kernel32
@@ -269,7 +292,7 @@ class Console:
         print('\033[?25h', end='')
 
     def _cursor_up(self, n):
-        print(f'\033[{n}A', end='')
+        return f'\033[{n}A'
 
     def _setup_title(self):
         name, x, y = self.name, self.x, self.y

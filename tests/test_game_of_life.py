@@ -163,7 +163,7 @@ class TestGameOfLife(unittest.TestCase):
         self.assertEqual(game._next_cell(2, 4), 0)  # dead=7 keep
         self.assertEqual(game._next_cell(4, 4), 0)  # dead=8 keep
 
-    def test_update(self):
+    def test_next_step(self):
         world = [
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -200,10 +200,10 @@ class TestGameOfLife(unittest.TestCase):
         ]
         game = GameOfLife(world=world)
         for _ in range(4):
-            game._update()
+            game._next_step()
         self.assertEqual(game.world, expected)
 
-    def test_update_mortal(self):
+    def test_next_step_mortal(self):
         world = [
             [0, 0, 0, 0],
             [0, 1, 1, 0],
@@ -218,10 +218,10 @@ class TestGameOfLife(unittest.TestCase):
         ]
         game = GameOfLife(world=world, mortal=True)
         for _ in range(4):
-            game._update()
+            game._next_step()
         self.assertEqual(game.ages, expected)
 
-    def test_update_mortal2(self):
+    def test_next_step_mortal2(self):
         world = [
             [0, 0, 0, 0, 0],
             [0, 0, 1, 0, 0],
@@ -238,7 +238,7 @@ class TestGameOfLife(unittest.TestCase):
         ]
         game = GameOfLife(world=world, mortal=True)
         for i in range(4):
-            game._update()
+            game._next_step()
         self.assertEqual(game.ages, expected)
 
     def test_glider_elp(self):
