@@ -147,8 +147,8 @@ class GameOfLife:
                             alive += 1
 
                 # judge next cell
-                if now_world[y][x]:
-                    next_cell = 1 if alive == 2 or alive == 3 else 0
+                if now_world[y][x] and (alive == 2 or alive == 3):
+                    next_cell = 1
                 elif alive == 3:
                     if self.color:
                         # if color option is enabled,
@@ -242,12 +242,11 @@ class Console:
         self._cursor_show()
 
     def display(self, world, step, colors):
-        screen = ''
+        cursor_up = ''
         if step > 1:
-            screen += self._cursor_up(self.y + 4)
-        screen += self._get_title()
-        screen += self._get_world(world, colors)
-        screen += self._get_step(step)
+            cursor_up = self._cursor_up(self.y + 4)
+        screen = cursor_up + self._get_title() + \
+            self._get_world(world, colors) + self._get_step(step)
         print(screen, end='')
 
     def _enable_win_escape_code(self):
