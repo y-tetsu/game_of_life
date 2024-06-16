@@ -5,8 +5,6 @@ from random import random
 from datetime import datetime
 import json
 import pprint
-import queue
-import threading
 
 
 class GameOfLife:
@@ -76,30 +74,17 @@ class GameOfLife:
 
     def start(self):
         try:
-            # 1st screen
             self.console.setup()
-            world, step, colors = self.world, self.step, self.colors
-            screen = self.console._get_screen(world, step, colors)
-            print(screen, end='')
-            if self.delay:
-                time.sleep(self.delay)
-
-            # thread setup
-            q = queue.Queue(1)
-            thread = threading.Thread(
-                    target=self._update, args=(q,), daemon=True)
-            thread.start()
-
-            # update screen
-            max_step, loop = self.max_step, self.loop
             while True:
-                self._wait()
-                screen, step = q.get(timeout=0.5)
-                print(str(screen), end='')
-                if step >= max_step:
-                    if not loop:
+                self.console.display(self.world, self.step, self.colors)
+                if self.step == self.max_step:
+                    if not self.loop:
                         # if loop option is enabled, game_of_life is never end.
                         break
+                if self.step == 1:
+                    time.sleep(self.delay)
+                self._update()
+                self._wait()
         except KeyboardInterrupt:
             return
         finally:
@@ -134,33 +119,55 @@ class GameOfLife:
         except FileNotFoundError:
             pass
 
-    def _update(self, q):
-        while True:
-            self._next_step()
-            world, step, colors = self.world, self.step, self.colors
-            screen = self.console._get_screen(world, step, colors)
-            q.put((screen, step))
-
-    def _next_step(self):
-        max_y, max_x = self.y, self.x
-        world, colors = self.world, self.colors
+    def _update(self):
+        max_y, max_x, dirs = self.y, self.x, self.dirs
+        world, colors, torus = self.world, self.colors, self.torus
         mortal, ages = self.mortal, self.ages
-        new_world = []
+
+        now_world = [[x for x in row] for row in world]
         for y in range(max_y):
-            next_cells = []
             for x in range(max_x):
-                if next_cell := self._next_cell(x, y):
+                next_cell, alive, color = 0, 0, 0
+                # check around
+                for dx, dy in dirs:
+                    next_x, next_y = x + dx, y + dy
+                    calc = False
+                    if torus:
+                        # if torus option is enabled,
+                        # top and bottom, left and right are connected.
+                        next_x, next_y = next_x % max_x, next_y % max_y
+                        calc = True
+                    else:
+                        calc = (0 <= next_x < max_x) and (0 <= next_y < max_y)
+                    if calc:
+                        next_color = colors[next_y][next_x]
+                        if next_color > color:
+                            color = next_color
+                        if now_world[next_y][next_x]:
+                            alive += 1
+
+                # judge next cell
+                if now_world[y][x]:
+                    next_cell = 1 if alive == 2 or alive == 3 else 0
+                elif alive == 3:
+                    if self.color:
+                        # if color option is enabled,
+                        # new cell evolves from most evolved cell around it.
+                        # immediate reflection due to diversity.
+                        self.colors[y][x] = color + 1
+                    next_cell = 1
+                if next_cell:
                     if mortal:
                         # if mortal option is enabled, living cells are ageing.
-                        if world[y][x]:
+                        if now_world[y][x]:
                             next_cell = self._ageing(x, y, next_cell)
                         else:
                             ages[y][x] = 1
                 else:
                     ages[y][x], colors[y][x] = 0, 0
-                next_cells += [next_cell]
-            new_world += [next_cells]
-        self.world = [[x for x in row] for row in new_world]
+
+                # update world
+                world[y][x] = next_cell
         self.step += 1
 
     def _ageing(self, x, y, cell):
@@ -174,41 +181,6 @@ class GameOfLife:
             self.ages[y][x] = 0
             cell = 0
         return cell
-
-    def _next_cell(self, x, y):
-        alive, color = self._get_around(x, y)
-        if self.world[y][x]:
-            return 1 if alive == 2 or alive == 3 else 0
-        if alive == 3:
-            if self.color:
-                # if color option is enabled,
-                # the new cell evolves from the most evolved cell around it.
-                # immediate reflection due to diversity.
-                self.colors[y][x] = color + 1
-            return 1
-        return 0
-
-    def _get_around(self, x, y):
-        max_x, max_y = self.x, self.y
-        world, colors, torus = self.world, self.colors, self.torus
-        alive, color = 0, 0
-        for dx, dy in self.dirs:
-            next_x, next_y = x + dx, y + dy
-            calc = False
-            if torus:
-                # if torus option is enabled,
-                # top and bottom, left and right are connected.
-                next_x, next_y = next_x % max_x, next_y % max_y
-                calc = True
-            else:
-                calc = (0 <= next_x < max_x) and (0 <= next_y < max_y)
-            if calc:
-                next_color = colors[next_y][next_x]
-                if next_color > color:
-                    color = next_color
-                if world[next_y][next_x]:
-                    alive += 1
-        return alive, color
 
     def _wait(self):
         time.sleep(self.wait)
@@ -269,14 +241,14 @@ class Console:
     def teardown(self):
         self._cursor_show()
 
-    def _get_screen(self, world, step, colors):
+    def display(self, world, step, colors):
         screen = ''
         if step > 1:
             screen += self._cursor_up(self.y + 4)
         screen += self._get_title()
         screen += self._get_world(world, colors)
         screen += self._get_step(step)
-        return screen
+        print(screen, end='')
 
     def _enable_win_escape_code(self):
         kernel = windll.kernel32
