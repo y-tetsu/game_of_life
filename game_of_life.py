@@ -323,19 +323,19 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
                 description='A game of life simulator on CLI')
     parser.add_argument('sample', nargs='?')
-    parser.add_argument('-n', '--name')
-    parser.add_argument('-x', type=int)
-    parser.add_argument('-y', type=int)
-    parser.add_argument('-j', '--json')
-    parser.add_argument('-s', '--step', type=int)
-    parser.add_argument('-w', '--wait', type=float)
-    parser.add_argument('-d', '--delay', type=float)
-    parser.add_argument('-a', '--alive')
-    parser.add_argument('-r', '--ratio', type=float)
-    parser.add_argument('-l', '--loop', action="store_true")
-    parser.add_argument('-t', '--torus', action="store_true")
-    parser.add_argument('-m', '--mortal', action="store_true")
-    parser.add_argument('-c', '--color', action="store_true")
+    # requied text arg
+    for option in (('-n', '--name'), ('-j', '--json'), ('-a', '--alive')):
+        parser.add_argument(*option)
+    # requied int arg
+    for option in (('-x',), ('-y',), ('-s', '--step')):
+        parser.add_argument(*option, type=int)
+    # requied float arg
+    for option in (('-w', '--wait'), ('-d', '--delay'), ('-r', '--ratio')):
+        parser.add_argument(*option, type=float)
+    # flag option
+    for option in (('-l', '--loop'), ('-t', '--torus'), ('-m', '--mortal'),
+                   ('-c', '--color')):
+        parser.add_argument(*option, action="store_true")
     args = parser.parse_args()
 
     setting = {}
