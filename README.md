@@ -1,8 +1,12 @@
 # game_of_life
 Pythonで作ったCLIで動くライフゲーム
 
-## 説明
+## 説明記事
+### Pythonで作ったCLIで動くライフゲーム
 https://qiita.com/y-tetsu/items/264d263717f933ad3cb2
+
+### Pythonで作ったCLIで動くライフゲーム#2
+https://qiita.com/y-tetsu/items/2db7ce8dd2f8884c2028
 
 ## デモ
 ### ランダム
