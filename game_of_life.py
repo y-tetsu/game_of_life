@@ -322,46 +322,46 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(
                 description='A game of life simulator on CLI')
+
+    # requied arg
     parser.add_argument('sample', nargs='?')
-    # requied text arg
-    for option in (('-n', '--name'), ('-j', '--json'), ('-a', '--alive')):
+    # requied optional text arg
+    options = (('-n', '--name'), ('-j', '--json'), ('-a', '--alive'))
+    for option in options:
         parser.add_argument(*option)
-    # requied int arg
-    for option in (('-x',), ('-y',), ('-s', '--step')):
+    # requied optional int arg
+    options = (('-x',), ('-y',), ('-s', '--step'))
+    for option in options:
         parser.add_argument(*option, type=int)
-    # requied float arg
-    for option in (('-w', '--wait'), ('-d', '--delay'), ('-r', '--ratio')):
+    # requied optional float arg
+    options = (('-w', '--wait'), ('-d', '--delay'), ('-r', '--ratio'))
+    for option in options:
         parser.add_argument(*option, type=float)
-    # flag option
-    for option in (('-l', '--loop'), ('-t', '--torus'), ('-m', '--mortal'),
-                   ('-c', '--color')):
+    # optional flag
+    options = (
+        ('-l', '--loop'), ('-t', '--torus'), ('-m', '--mortal'),
+        ('-c', '--color'))
+    for option in options:
         parser.add_argument(*option, action="store_true")
     args = parser.parse_args()
 
     setting = {}
-    if args.sample:
-        setting['sample'] = args.sample
-    if args.name:
-        setting['name'] = args.name
-    if args.x:
-        setting['x'] = args.x
-    if args.y:
-        setting['y'] = args.y
-    if args.json:
-        setting['json_file'] = args.json
-    if args.step:
-        setting['max_step'] = args.step
+    # set args if defined
+    options = (
+        ('sample', args.sample), ('name', args.name), ('x', args.x),
+        ('y', args.y), ('json_file', args.json), ('max_step', args.step),
+        ('delay', args.delay), ('alive', args.alive), ('ratio', args.ratio))
+    for key, value in options:
+        if value:
+            setting[key] = value
+    # set args if not None
     if args.wait is not None:
         setting['wait'] = args.wait
-    if args.delay:
-        setting['delay'] = args.delay
-    if args.alive:
-        setting['alive'] = args.alive
-    if args.ratio:
-        setting['ratio'] = args.ratio
-    setting['loop'] = args.loop
-    setting['torus'] = args.torus
-    setting['mortal'] = args.mortal
-    setting['color'] = args.color
+    # set args
+    options = (
+        ('loop', args.loop), ('torus', args.torus), ('mortal', args.mortal),
+        ('color', args.color))
+    for key, value in options:
+        setting[key] = value
 
     GameOfLife(**setting).start()
