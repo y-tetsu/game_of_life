@@ -221,7 +221,7 @@ class Console:
         if 'win' in system().lower():
             self._enable_win_escape_code()
         self.color_list = [
-            '\x1b[39m',                # 0: default
+            '\033[39m',                # 0: default
             '\033[38;2;255;255;255m',  # 1: white
             '\033[38;2;0;153;68m',     # 2: green
             '\033[38;2;230;0;18m',     # 3: red
