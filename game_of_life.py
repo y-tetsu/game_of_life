@@ -154,7 +154,7 @@ class GameOfLife:
                         # if color option is enabled,
                         # new cell evolves from most evolved cell around it.
                         # immediate reflection due to diversity.
-                        self.colors[y][x] = color + 1
+                        colors[y][x] = color + 1
                     next_cell = 1
                 if next_cell:
                     if mortal:
