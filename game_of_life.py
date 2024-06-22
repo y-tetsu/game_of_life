@@ -67,7 +67,8 @@ class GameOfLife:
         self.lifespans = [alive[1] for alive in self.alives]
         self.marks = [alive[0] for alive in self.alives]
 
-        self.console = Console(self.x, self.y, self.name, self.marks)
+        self.console = Console(self.x, self.y, self.name,
+                               self.marks, self.color)
 
         if rand:
             self._dump()
@@ -150,11 +151,7 @@ class GameOfLife:
                 if now_world[y][x] and (alive == 2 or alive == 3):
                     next_cell = 1
                 elif alive == 3:
-                    if self.color:
-                        # if color option is enabled,
-                        # new cell evolves from most evolved cell around it.
-                        # immediate reflection due to diversity.
-                        colors[y][x] = color + 1
+                    colors[y][x] = color + 1
                     next_cell = 1
                 if next_cell:
                     if mortal:
@@ -213,7 +210,7 @@ class GameOfLife:
 
 
 class Console:
-    def __init__(self, x, y, name, marks):
+    def __init__(self, x, y, name, marks, color):
         self.x = x
         self.y = y
         self.name = name
@@ -233,6 +230,10 @@ class Console:
             '\033[38;2;146;7;131m',    # 9: purple
         ]
         self.title = self._setup_title()
+
+        self._get_world = self._get_uncolorized_world
+        if color:
+            self._get_world = self._get_colorized_world
 
     def setup(self):
         self._clear_screen()
@@ -277,7 +278,22 @@ class Console:
     def _get_title(self):
         return f"{self.title}\n"
 
-    def _get_world(self, world, colors):
+    def _get_uncolorized_world(self, world, _):
+        marks = self.marks
+        max_y, max_x = self.y, self.x
+        line = []
+        # setup screen for display world on cli
+        screen = '┌' + ('─' * (max_x * 2)) + '┐\n'
+        for y in range(max_y):
+            cells = ''
+            for x in range(max_x):
+                cells += marks[world[y][x]]
+            line += ['│' + cells + '│']
+        screen += '\n'.join(line) + '\n'
+        screen += '└' + ('─' * (max_x * 2)) + '┘\n'
+        return screen
+
+    def _get_colorized_world(self, world, colors):
         color_list = self.color_list
         marks = self.marks
         max_y, max_x = self.y, self.x
