@@ -126,6 +126,7 @@ class GameOfLife:
         mortal, ages = self.mortal, self.ages
 
         now_world = [[x for x in row] for row in world]
+        now_colors = [[x for x in row] for row in colors]
         for y in range(max_y):
             for x in range(max_x):
                 next_cell, alive, color = 0, 0, 0
@@ -141,7 +142,7 @@ class GameOfLife:
                     else:
                         calc = (0 <= next_x < max_x) and (0 <= next_y < max_y)
                     if calc:
-                        next_color = colors[next_y][next_x]
+                        next_color = now_colors[next_y][next_x]
                         if next_color > color:
                             color = next_color
                         if now_world[next_y][next_x]:
