@@ -6,6 +6,9 @@ from datetime import datetime
 import json
 import pprint
 
+import numpy as np
+import cv2
+
 
 class GameOfLife:
     def __init__(self, sample=None, name='game_of_life', x=30, y=15,
@@ -52,11 +55,6 @@ class GameOfLife:
             rand = False
             self._load(json_file)
 
-        self.dirs = [
-            (-1, -1), (0, -1), (1, -1),
-            (-1,  0),          (1,  0),
-            (-1,  1), (0,  1), (1,  1),
-        ]
         self.step = 1
         self.ages = [[x for x in row] for row in self.world]
         self.colors = [[0 for _ in row] for row in self.world]
@@ -72,6 +70,12 @@ class GameOfLife:
 
         if rand:
             self._dump()
+
+        # numpy & open-cv
+        self.world = np.array(self.world, dtype=np.uint8)
+        self.colors = np.array(self.colors, dtype=np.uint8)
+        self.kernel = np.array(
+                [[1, 1, 1], [1, 0, 1], [1, 1, 1]], dtype=np.uint8)
 
     def start(self):
         try:
@@ -121,51 +125,52 @@ class GameOfLife:
             pass
 
     def _update(self):
-        max_y, max_x, dirs = self.y, self.x, self.dirs
-        world, colors, torus = self.world, self.colors, self.torus
-        mortal, ages = self.mortal, self.ages
+        max_y, max_x = self.y, self.x
+        torus, mortal = self.torus, self.mortal
+        kernel = self.kernel
 
-        now_world = [[x for x in row] for row in world]
-        now_colors = [[x for x in row] for row in colors]
+        now_world, now_colors = None, None
+        if torus:
+            now_world = np.pad(self.world, 1, 'wrap')
+            now_colors = np.pad(self.colors, 1, 'wrap')
+        else:
+            now_world = np.copy(self.world)
+            now_colors = np.copy(self.colors)
+
+        ones = np.ones_like(now_world, dtype=np.uint8)
+        now_alives = (now_world >= 1) * ones
+        count = cv2.filter2D(now_alives, -1, kernel)
+
+        max_colors = cv2.dilate(now_colors, kernel)
+
+        if torus:
+            now_world = now_world[1:-1, 1:-1]
+            now_colors = now_colors[1:-1, 1:-1]
+            count = count[1:-1, 1:-1]
+            max_colors = max_colors[1:-1, 1:-1]
+            ones = ones[1:-1, 1:-1]
+            now_alives = now_alives[1:-1, 1:-1]
+
+        alive = (now_alives == 1) * ((count == 2) + (count == 3))
+        born = (now_alives == 0) * (count == 3)
+
+        self.world = now_world * alive
+        self.world[np.where(born)] = 1
+
+        self.colors = alive * now_colors + born * (max_colors + ones)
+
         for y in range(max_y):
             for x in range(max_x):
-                next_cell, alive, color = 0, 0, 0
-                # check around
-                for dx, dy in dirs:
-                    next_x, next_y = x + dx, y + dy
-                    calc = False
-                    if torus:
-                        # if torus option is enabled,
-                        # top and bottom, left and right are connected.
-                        next_x, next_y = next_x % max_x, next_y % max_y
-                        calc = True
-                    else:
-                        calc = (0 <= next_x < max_x) and (0 <= next_y < max_y)
-                    if calc:
-                        next_color = now_colors[next_y][next_x]
-                        if next_color > color:
-                            color = next_color
-                        if now_world[next_y][next_x]:
-                            alive += 1
-
-                # judge next cell
-                if now_world[y][x] and (alive == 2 or alive == 3):
-                    next_cell = 1
-                elif alive == 3:
-                    colors[y][x] = color + 1
-                    next_cell = 1
-                if next_cell:
+                next_cells = self.world[y][x]
+                if next_cells:
                     if mortal:
                         # if mortal option is enabled, living cells are ageing.
-                        if now_world[y][x]:
-                            next_cell = self._ageing(x, y, next_cell)
+                        if alive[y][x]:
+                            self.world[y][x] = self._ageing(x, y, next_cells)
                         else:
-                            ages[y][x] = 1
+                            self.ages[y][x] = 1
                 else:
-                    ages[y][x], colors[y][x] = 0, 0
-
-                # update world
-                world[y][x] = next_cell
+                    self.ages[y][x] = 0
         self.step += 1
 
     def _ageing(self, x, y, cell):

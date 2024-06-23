@@ -50,7 +50,7 @@ class TestGameOfLife(unittest.TestCase):
         self.assertEqual(game.console.name, name)
         self.assertEqual(game.x, x)
         self.assertEqual(game.y, y)
-        self.assertEqual(game.world, world)
+        self.assertEqual([[x for x in row] for row in game.world], world)
         self.assertEqual(game.max_step, max_step)
         self.assertEqual(game.wait, wait)
         self.assertEqual(game.delay, delay)
@@ -99,7 +99,7 @@ class TestGameOfLife(unittest.TestCase):
         game = GameOfLife(world=world)
         for _ in range(4):
             game._update()
-        self.assertEqual(game.world, expected)
+        self.assertEqual([[x for x in row] for row in game.world], expected)
 
     def test_update_mortal(self):
         world = [
@@ -167,7 +167,7 @@ class TestGameOfLife(unittest.TestCase):
         game = GameOfLife(world=world, torus=True)
         for i in range(40):
             game._update()
-        self.assertEqual(game.world, expected)
+        self.assertEqual([[x for x in row] for row in game.world], expected)
 
     def test_update_color(self):
         world = [
@@ -364,8 +364,10 @@ class TestGameOfLife(unittest.TestCase):
                 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]  # noqa: E501
         game = GameOfLife(world=world, mortal=True, color=True, torus=False)
         game._update()
-        self.assertEqual(game.world, expected_world)
-        self.assertEqual(game.colors, expected_colors)
+        self.assertEqual([[x for x in row] for row in game.world],
+                         expected_world)
+        self.assertEqual([[x for x in row] for row in game.colors],
+                         expected_colors)
         self.assertEqual(game.ages, expected_ages)
 
     def test_glider_elp(self):
