@@ -169,20 +169,22 @@ class GameOfLife:
                             self.world[y][x] = self._ageing(x, y, next_cells)
                         else:
                             self.ages[y][x] = 1
-                    else:
-                        self.ages[y][x] = 0
+
+            self.ages[np.where(alive)] += 1
+
+            max_lifespan = self.lifespans[-1]
+            self.world[np.where(self.ages >= max_lifespan)] = 0
+
+            self.ages[np.where(self.world == 0)] = 0
+            self.ages[np.where(self.ages >= max_lifespan)] = 0
+
         self.step += 1
 
     def _ageing(self, x, y, cell):
-        self.ages[y][x] += 1
         for index, lifespan in enumerate(self.lifespans):
             if self.ages[y][x] < lifespan:
                 cell = index
                 break
-        else:
-            # lifespan has expired.
-            self.ages[y][x] = 0
-            cell = 0
         return cell
 
     def _wait(self):
