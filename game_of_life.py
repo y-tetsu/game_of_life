@@ -159,18 +159,18 @@ class GameOfLife:
 
         self.colors = alive * now_colors + born * (max_colors + ones)
 
-        for y in range(max_y):
-            for x in range(max_x):
-                next_cells = self.world[y][x]
-                if next_cells:
-                    if mortal:
+        if mortal:
+            for y in range(max_y):
+                for x in range(max_x):
+                    next_cells = self.world[y][x]
+                    if next_cells:
                         # if mortal option is enabled, living cells are ageing.
                         if alive[y][x]:
                             self.world[y][x] = self._ageing(x, y, next_cells)
                         else:
                             self.ages[y][x] = 1
-                else:
-                    self.ages[y][x] = 0
+                    else:
+                        self.ages[y][x] = 0
         self.step += 1
 
     def _ageing(self, x, y, cell):
