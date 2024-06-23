@@ -56,7 +56,6 @@ class GameOfLife:
             self._load(json_file)
 
         self.step = 1
-        self.ages = [[x for x in row] for row in self.world]
         self.colors = [[0 for _ in row] for row in self.world]
         if colors:
             self.colors = colors
@@ -73,6 +72,7 @@ class GameOfLife:
 
         # numpy & open-cv
         self.world = np.array(self.world, dtype=np.uint8)
+        self.ages = np.copy(self.world)
         self.colors = np.array(self.colors, dtype=np.uint8)
         self.kernel = np.array(
                 [[1, 1, 1], [1, 0, 1], [1, 1, 1]], dtype=np.uint8)

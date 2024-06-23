@@ -117,7 +117,7 @@ class TestGameOfLife(unittest.TestCase):
         game = GameOfLife(world=world, mortal=True)
         for _ in range(4):
             game._update()
-        self.assertEqual(game.ages, expected)
+        self.assertEqual([[x for x in row] for row in game.ages], expected)
 
     def test_update_mortal2(self):
         world = [
@@ -137,7 +137,7 @@ class TestGameOfLife(unittest.TestCase):
         game = GameOfLife(world=world, mortal=True)
         for i in range(4):
             game._update()
-        self.assertEqual(game.ages, expected)
+        self.assertEqual([[x for x in row] for row in game.ages], expected)
 
     def test_update_torus(self):
         world = [
@@ -368,7 +368,8 @@ class TestGameOfLife(unittest.TestCase):
                          expected_world)
         self.assertEqual([[x for x in row] for row in game.colors],
                          expected_colors)
-        self.assertEqual(game.ages, expected_ages)
+        self.assertEqual([[x for x in row] for row in game.ages],
+                         expected_ages)
 
     def test_glider_elp(self):
         import time
