@@ -139,7 +139,8 @@ class GameOfLife:
 
         ones = np.ones_like(now_world, dtype=np.uint8)
         now_alives = (now_world >= 1) * ones
-        count = cv2.filter2D(now_alives, -1, kernel)
+        border_type = cv2.BORDER_CONSTANT
+        count = cv2.filter2D(now_alives, -1, kernel, borderType=border_type)
 
         max_colors = cv2.dilate(now_colors, kernel)
 
