@@ -125,47 +125,46 @@ class GameOfLife:
             pass
 
     def _update(self):
-        torus, mortal = self.torus, self.mortal
+        # get previous
+        pre_world = np.copy(self.world)
+        ones = np.ones_like(pre_world, dtype=np.uint8)
+        pre_cells = (pre_world >= 1) * ones
+        pre_colors = np.copy(self.colors)
+
+        if self.torus:
+            # wrap around
+            pre_cells = np.pad(pre_cells, 1, 'wrap')
+            pre_colors = np.pad(pre_colors, 1, 'wrap')
+
+        # get alive and born
         kernel = self.kernel
-
-        now_world, now_colors = None, None
-        if torus:
-            now_world = np.pad(self.world, 1, 'wrap')
-            now_colors = np.pad(self.colors, 1, 'wrap')
-        else:
-            now_world = np.copy(self.world)
-            now_colors = np.copy(self.colors)
-
-        ones = np.ones_like(now_world, dtype=np.uint8)
-        now_alives = (now_world >= 1) * ones
         border_type = cv2.BORDER_ISOLATED
-        count = cv2.filter2D(now_alives, -1, kernel, borderType=border_type)
+        around_cells = cv2.filter2D(pre_cells, -1,
+                                    kernel, borderType=border_type)
+        max_colors = cv2.dilate(pre_colors, kernel, borderType=border_type)
 
-        max_colors = cv2.dilate(now_colors, kernel, borderType=border_type)
-
-        if torus:
-            now_world = now_world[1:-1, 1:-1]
-            now_colors = now_colors[1:-1, 1:-1]
-            count = count[1:-1, 1:-1]
+        if self.torus:
+            # remove around
+            pre_cells = pre_cells[1:-1, 1:-1]
+            pre_colors = pre_colors[1:-1, 1:-1]
+            around_cells = around_cells[1:-1, 1:-1]
             max_colors = max_colors[1:-1, 1:-1]
-            ones = ones[1:-1, 1:-1]
-            now_alives = now_alives[1:-1, 1:-1]
 
-        alive = (now_alives == 1) * ((count == 2) | (count == 3))
-        born = (now_alives == 0) * (count == 3)
-        all_cells = alive | born
+        alive = (pre_cells == 1) * ((around_cells == 2) | (around_cells == 3))
+        born = (pre_cells == 0) * (around_cells == 3)
 
-        self.world = all_cells * ones
-        self.colors = alive * now_colors + born * (max_colors + ones)
+        # update next cells
+        next_cells = alive | born
+        self.world = next_cells * ones
+        self.colors = alive * pre_colors + born * (max_colors + ones)
 
-        if mortal:
-            # ageing
+        if self.mortal:
+            # aging
             max_index = len(self.lifespans) - 1
             for index, lifespan in enumerate(reversed(self.lifespans)):
-                ageing_cell = np.where(alive & (self.ages < lifespan))
-                self.world[ageing_cell] = max_index - index
-            self.ages[np.where(alive)] += 1
-            self.ages[np.where(born)] = 1
+                aging_cells = np.where(alive & (self.ages < lifespan))
+                self.world[aging_cells] = max_index - index
+            self.ages[np.where(next_cells)] += 1
 
             # check if expiring lifespan
             max_lifespan = self.lifespans[-1]
