@@ -141,7 +141,7 @@ class GameOfLife:
         border_type = cv2.BORDER_ISOLATED
         count = cv2.filter2D(now_alives, -1, kernel, borderType=border_type)
 
-        max_colors = cv2.dilate(now_colors, kernel)
+        max_colors = cv2.dilate(now_colors, kernel, borderType=border_type)
 
         if torus:
             now_world = now_world[1:-1, 1:-1]
