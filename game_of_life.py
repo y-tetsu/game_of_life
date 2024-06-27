@@ -152,12 +152,11 @@ class GameOfLife:
             ones = ones[1:-1, 1:-1]
             now_alives = now_alives[1:-1, 1:-1]
 
-        alive = (now_alives == 1) * ((count == 2) + (count == 3))
+        alive = (now_alives == 1) * ((count == 2) | (count == 3))
         born = (now_alives == 0) * (count == 3)
+        all_cells = alive | born
 
-        self.world = now_world * alive
-        self.world[np.where(born)] = 1
-
+        self.world = all_cells * ones
         self.colors = alive * now_colors + born * (max_colors + ones)
 
         if mortal:
@@ -168,16 +167,14 @@ class GameOfLife:
                         # if mortal option is enabled, living cells are ageing.
                         if alive[y][x]:
                             self.world[y][x] = self._ageing(x, y, next_cells)
-                        else:
-                            self.ages[y][x] = 1
 
             self.ages[np.where(alive)] += 1
+            self.ages[np.where(born)] = 1
 
+            # check if expiring lifespan
             max_lifespan = self.lifespans[-1]
             self.world[np.where(self.ages >= max_lifespan)] = 0
-
             self.ages[np.where(self.world == 0)] = 0
-            self.ages[np.where(self.ages >= max_lifespan)] = 0
 
         self.step += 1
 
