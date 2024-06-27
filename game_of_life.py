@@ -125,7 +125,6 @@ class GameOfLife:
             pass
 
     def _update(self):
-        max_y, max_x = self.y, self.x
         torus, mortal = self.torus, self.mortal
         kernel = self.kernel
 
@@ -160,14 +159,11 @@ class GameOfLife:
         self.colors = alive * now_colors + born * (max_colors + ones)
 
         if mortal:
-            for y in range(max_y):
-                for x in range(max_x):
-                    next_cells = self.world[y][x]
-                    if next_cells:
-                        # if mortal option is enabled, living cells are ageing.
-                        if alive[y][x]:
-                            self.world[y][x] = self._ageing(x, y, next_cells)
-
+            # ageing
+            max_index = len(self.lifespans) - 1
+            for index, lifespan in enumerate(reversed(self.lifespans)):
+                ageing_cell = np.where(alive & (self.ages < lifespan))
+                self.world[ageing_cell] = max_index - index
             self.ages[np.where(alive)] += 1
             self.ages[np.where(born)] = 1
 
@@ -177,13 +173,6 @@ class GameOfLife:
             self.ages[np.where(self.world == 0)] = 0
 
         self.step += 1
-
-    def _ageing(self, x, y, cell):
-        for index, lifespan in enumerate(self.lifespans):
-            if self.ages[y][x] < lifespan:
-                cell = index
-                break
-        return cell
 
     def _wait(self):
         time.sleep(self.wait)
@@ -275,7 +264,7 @@ class Console:
     def _setup_title(self):
         name, x, y = self.name, self.x, self.y
         count = x * y
-        max_cell_size = 3025
+        max_cell_size = 3250
         title = f'{name} ({x} x {y})'
         if count > max_cell_size:
             title += f' * warning : max_cell_size({max_cell_size}) is over! *'
