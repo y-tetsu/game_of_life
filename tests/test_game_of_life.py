@@ -470,7 +470,7 @@ class TestGameOfLife(unittest.TestCase):
         setting['sample'] = 'noahs-ark'
         setting['torus'] = True
         setting['mortal'] = True
-        setting['color'] = True
+        setting['color2'] = True
         setting['wait'] = 0.0
         for _ in range(3):
             GameOfLife(**setting).start()

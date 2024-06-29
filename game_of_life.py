@@ -14,7 +14,7 @@ class GameOfLife:
     def __init__(self, sample=None, name='game_of_life', x=30, y=15,
                  world=None, max_step=None, wait=0.03, delay=0.0,
                  alive='■', ratio=0.5, loop=False, torus=False, mortal=False,
-                 color=False, json_file=None):
+                 color=False, color2=False, json_file=None):
         self.sample = sample
         self.name = name
         samples, colors = self._load_samples('samples.json'), None
@@ -50,6 +50,7 @@ class GameOfLife:
         self.torus = torus
         self.mortal = mortal
         self.color = color
+        self.color2 = color2
 
         if json_file is not None:
             rand = False
@@ -64,8 +65,13 @@ class GameOfLife:
         self.lifespans = [alive[1] for alive in self.alives]
         self.marks = [alive[0] for alive in self.alives]
 
+        color_type = None
+        if color:
+            color_type = 'normal'
+        elif color2:
+            color_type = 'pastel'
         self.console = Console(self.x, self.y, self.name,
-                               self.marks, self.color)
+                               self.marks, color_type)
 
         if rand:
             self._dump()
@@ -121,6 +127,7 @@ class GameOfLife:
                 self.torus = settings['torus']
                 self.mortal = settings['mortal']
                 self.color = settings['color']
+                self.color2 = settings['color2']
         except FileNotFoundError:
             pass
 
@@ -193,6 +200,7 @@ class GameOfLife:
             'torus': self.torus,
             'mortal': self.mortal,
             'color': self.color,
+            'color2': self.color2,
         }
         with open(json_file, 'w') as f:
             output = pprint.pformat(settings, indent=4,
@@ -204,29 +212,43 @@ class GameOfLife:
 
 
 class Console:
-    def __init__(self, x, y, name, marks, color):
+    def __init__(self, x, y, name, marks, color_type):
         self.x = x
         self.y = y
         self.name = name
         self.marks = marks
         if 'win' in system().lower():
             self._enable_win_escape_code()
-        self.color_list = [
-            '\033[39m',                # 0: default
-            '\033[38;2;255;255;255m',  # 1: white
-            '\033[38;2;168;255;211m',  # 2: green
-            '\033[38;2;255;168;211m',  # 3: red
-            '\033[38;2;255;255;168m',  # 4: yellow
-            '\033[38;2;255;168;168m',  # 5: brown
-            '\033[38;2;168;255;255m',  # 6: cyan
-            '\033[38;2;255;168;255m',  # 7: pink
-            '\033[38;2;255;211;168m',  # 8: orange
-            '\033[38;2;211;168;255m',  # 9: purple
-        ]
+        if color_type == 'normal':
+            self.color_list = [
+                '\033[39m',                # 0: default
+                '\033[38;2;255;255;255m',  # 1: white
+                '\033[38;2;0;153;68m',     # 2: green
+                '\033[38;2;230;0;18m',     # 3: red
+                '\033[38;2;235;202;27m',   # 4: yellow
+                '\033[38;2;145;0;0m',      # 5: brown
+                '\033[38;2;0;160;233m',    # 6: cyan
+                '\033[38;2;241;158;194m',  # 7: pink
+                '\033[38;2;240;131;0m',    # 8: orange
+                '\033[38;2;146;7;131m',    # 9: purple
+            ]
+        elif color_type == 'pastel':
+            self.color_list = [
+                '\033[39m',                # 0: default
+                '\033[38;2;255;255;255m',  # 1: white
+                '\033[38;2;168;255;211m',  # 2: green
+                '\033[38;2;255;168;211m',  # 3: red
+                '\033[38;2;255;255;168m',  # 4: yellow
+                '\033[38;2;255;168;168m',  # 5: brown
+                '\033[38;2;168;255;255m',  # 6: cyan
+                '\033[38;2;255;168;255m',  # 7: pink
+                '\033[38;2;255;211;168m',  # 8: orange
+                '\033[38;2;211;168;255m',  # 9: purple
+            ]
         self.title = self._setup_title()
 
         self._get_world = self._get_uncolorized_world
-        if color:
+        if color_type is not None:
             self._get_world = self._get_colorized_world
             self.max_col = 18
             if y < self.max_col:
@@ -357,7 +379,7 @@ if __name__ == '__main__':
     # optional flag
     options = (
         ('-l', '--loop'), ('-t', '--torus'), ('-m', '--mortal'),
-        ('-c', '--color'))
+        ('-c', '--color'), ('-c2', '--color2'))
     for option in options:
         parser.add_argument(*option, action="store_true")
     args = parser.parse_args()
@@ -377,7 +399,7 @@ if __name__ == '__main__':
     # set args
     options = (
         ('loop', args.loop), ('torus', args.torus), ('mortal', args.mortal),
-        ('color', args.color))
+        ('color', args.color), ('color2', args.color2))
     for key, value in options:
         setting[key] = value
 
