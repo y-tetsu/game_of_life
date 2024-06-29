@@ -250,7 +250,7 @@ class Console:
         self._get_world = self._get_uncolorized_world
         if color_type is not None:
             self._get_world = self._get_colorized_world
-            self.max_col = 18
+            self.max_col = 18 if self.x * self.y > 3000 else 50
             if y < self.max_col:
                 self.max_col = y
             self.print_cnt = (y + self.max_col - 1) // self.max_col
@@ -266,10 +266,12 @@ class Console:
         cursor_up = ''
         if step > 1:
             cursor_up = self._cursor_up(self.y + 4)
-        print(cursor_up + self._get_title(), end='')
-        for screen in self._get_world(world, colors):
+
+        screens = self._get_world(world, colors)
+        screens[0] = cursor_up + self._get_title() + screens[0]
+        screens[-1] = screens[-1] + self._get_step(step)
+        for screen in screens:
             print(screen, end='')
-        print(self._get_step(step), end='')
 
     def _enable_win_escape_code(self):
         kernel = windll.kernel32
@@ -312,7 +314,7 @@ class Console:
             line += ['│' + cells + '│']
         screen += '\n'.join(line) + '\n'
         screen += '└' + ('─' * (max_x * 2)) + '┘\n'
-        return screen
+        return [screen]
 
     def _get_colorized_world(self, world, colors):
         color_list = self.color_list
