@@ -228,6 +228,10 @@ class Console:
         self._get_world = self._get_uncolorized_world
         if color:
             self._get_world = self._get_colorized_world
+            self.max_col = 18
+            if y < self.max_col:
+                self.max_col = y
+            self.print_cnt = (y + self.max_col - 1) // self.max_col
 
     def setup(self):
         self._clear_screen()
@@ -240,9 +244,10 @@ class Console:
         cursor_up = ''
         if step > 1:
             cursor_up = self._cursor_up(self.y + 4)
-        screen = cursor_up + self._get_title() + \
-            self._get_world(world, colors) + self._get_step(step)
-        print(screen, end='')
+        print(cursor_up + self._get_title(), end='')
+        for screen in self._get_world(world, colors):
+            print(screen, end='')
+        print(self._get_step(step), end='')
 
     def _enable_win_escape_code(self):
         kernel = windll.kernel32
@@ -263,7 +268,7 @@ class Console:
     def _setup_title(self):
         name, x, y = self.name, self.x, self.y
         count = x * y
-        max_cell_size = 3250
+        max_cell_size = 6552
         title = f'{name} ({x} x {y})'
         if count > max_cell_size:
             title += f' * warning : max_cell_size({max_cell_size}) is over! *'
@@ -294,7 +299,7 @@ class Console:
         max_color = len(color_list)
         line = []
         # setup screen for display world on cli
-        screen = '┌' + ('─' * (max_x * 2)) + '┐\n'
+        screens = ['┌' + ('─' * (max_x * 2)) + '┐\n']
         for y in range(max_y):
             cells, pre_color = '', 0
             for x in range(max_x):
@@ -319,9 +324,12 @@ class Console:
                 line += ['│' + cells + color_list[0] + '│']
             else:
                 line += ['│' + cells + '│']
-        screen += '\n'.join(line) + '\n'
-        screen += '└' + ('─' * (max_x * 2)) + '┘\n'
-        return screen
+        for i in range(self.print_cnt):
+            start = i * self.max_col
+            end = (i + 1) * self.max_col
+            screens += ['\n'.join(line[start:end]) + '\n']
+        screens += ['└' + ('─' * (max_x * 2)) + '┘\n']
+        return screens
 
     def _get_step(self, step):
         return f'step = {step}\n'
