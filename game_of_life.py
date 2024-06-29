@@ -10,6 +10,15 @@ import numpy as np
 import cv2
 
 
+# for lineprofiler
+try:
+    profile
+except NameError:
+    # dummy for no profile
+    def profile(func):
+        return func
+
+
 class GameOfLife:
     def __init__(self, sample=None, name='game_of_life', x=30, y=15,
                  world=None, max_step=None, wait=0.03, delay=0.0,
@@ -131,6 +140,7 @@ class GameOfLife:
         except FileNotFoundError:
             pass
 
+    @profile
     def _update(self):
         # get previous
         pre_world = np.copy(self.world)
