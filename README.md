@@ -8,6 +8,12 @@ https://qiita.com/y-tetsu/items/264d263717f933ad3cb2
 ### Pythonで作ったCLIで動くライフゲーム#2
 https://qiita.com/y-tetsu/items/2db7ce8dd2f8884c2028
 
+## インストール
+```
+pip install numpy
+pip install opencv-python
+```
+
 ## デモ
 ### ランダム
 <img src="images/random.gif" width="450px">
@@ -62,10 +68,10 @@ py game_of_life.py breeder2 -d 2
 ```
 
 #### グライダー銃
-<img src="images/glider-gun.gif" width="450px">
+<img src="images/glider-gun2.gif" width="450px">
 
 ```
-py game_of_life.py glider-gun -c
+py game_of_life.py glider-gun -c -w 0.05
 ```
 
 ### 長寿型
@@ -84,10 +90,10 @@ py game_of_life.py acorn -w 0
 ```
 
 #### ノアの方舟
-<img src="images/noahs-ark.gif" width="450px">
+<img src="images/noahs-ark2.gif" width="450px">
 
 ```
-py game_of_life.py noahs-ark -d 0.5 -w 0
+py game_of_life.py noahs-ark -d 0.5 -w 0 -c2
 ```
 
 ### エデンの園配置
