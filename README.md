@@ -74,6 +74,13 @@ py game_of_life.py breeder2 -d 2
 py game_of_life.py glider-gun -c -w 0.05
 ```
 
+#### シュシュポッポ列車
+<img src="images/puffer-train.gif" width="450px">
+
+```
+py game_of_life.py puffer-train
+```
+
 ### 長寿型
 #### ダイハード
 <img src="images/die-hard.gif" width="450px">
