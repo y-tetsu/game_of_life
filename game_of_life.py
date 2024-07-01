@@ -326,6 +326,7 @@ class Console:
         screen += '└' + ('─' * (max_x * 2)) + '┘\n'
         return [screen]
 
+    @profile
     def _get_colorized_world(self, world, colors):
         color_list = self.color_list
         marks = self.marks
@@ -336,28 +337,28 @@ class Console:
         screens = ['┌' + ('─' * (max_x * 2)) + '┐\n']
         for y in range(max_y):
             cells, pre_color = '', 0
-            for x in range(max_x):
-                mark = marks[world[y][x]]
-                if mark == '　':
-                    # if no mark, color must be not care
-                    cells += mark
-                else:
+            world_y = world[y]
+            colors_y = colors[y]
+            cells = ['　'] * max_x
+            for x, cell in enumerate(world_y):
+                if cell:
+                    mark = marks[cell]
                     # change color if it is different from previous
-                    if color := colors[y][x] % max_color:
+                    if color := colors_y[x] % max_color:
                         if color == pre_color:
-                            cells += mark
+                            cells[x] = mark
                         else:
-                            cells += color_list[color] + mark
+                            cells[x] = color_list[color] + mark
                     else:
                         if pre_color:
-                            cells += color_list[0] + mark
+                            cells[x] = color_list[0] + mark
                         else:
-                            cells += mark
+                            cells[x] = mark
                     pre_color = color
             if pre_color:
-                line += ['│' + cells + color_list[0] + '│']
+                line += ['│' + ''.join(cells) + color_list[0] + '│']
             else:
-                line += ['│' + cells + '│']
+                line += ['│' + ''.join(cells) + '│']
         for i in range(self.print_cnt):
             start = i * self.max_col
             end = (i + 1) * self.max_col
