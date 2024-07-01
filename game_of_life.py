@@ -263,7 +263,9 @@ class Console:
             self.max_col = 18 if self.x * self.y > 3000 else 50
             if y < self.max_col:
                 self.max_col = y
-            self.print_cnt = (y + self.max_col - 1) // self.max_col
+        else:
+            self.max_col = 80
+        self.print_cnt = (y + self.max_col - 1) // self.max_col
 
     def setup(self):
         self._clear_screen()
@@ -316,15 +318,18 @@ class Console:
         max_y, max_x = self.y, self.x
         line = []
         # setup screen for display world on cli
-        screen = '┌' + ('─' * (max_x * 2)) + '┐\n'
+        screens = ['┌' + ('─' * (max_x * 2)) + '┐\n']
         for y in range(max_y):
             cells = ''
             for x in range(max_x):
                 cells += marks[world[y][x]]
             line += ['│' + cells + '│']
-        screen += '\n'.join(line) + '\n'
-        screen += '└' + ('─' * (max_x * 2)) + '┘\n'
-        return [screen]
+        for i in range(self.print_cnt):
+            start = i * self.max_col
+            end = (i + 1) * self.max_col
+            screens += ['\n'.join(line[start:end]) + '\n']
+        screens += ['└' + ('─' * (max_x * 2)) + '┘\n']
+        return screens
 
     @profile
     def _get_colorized_world(self, world, colors):
