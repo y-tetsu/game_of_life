@@ -70,7 +70,7 @@ class GameOfLife:
         if colors:
             self.colors = colors
 
-        self.alives = [('  ', 0), (self.alive, 10), ('□', 30), ('・', 60)]
+        self.alives = [('　', 0), (self.alive, 10), ('□', 30), ('・', 60)]
         self.lifespans = [alive[1] for alive in self.alives]
         self.marks = [alive[0] for alive in self.alives]
 
@@ -338,7 +338,7 @@ class Console:
             cells, pre_color = '', 0
             for x in range(max_x):
                 mark = marks[world[y][x]]
-                if mark == '  ':
+                if mark == '　':
                     # if no mark, color must be not care
                     cells += mark
                 else:
