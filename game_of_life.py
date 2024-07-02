@@ -378,7 +378,7 @@ class Console:
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(
-                description='A game of life simulator on CLI')
+                description="Conway's Game of Life simulator on CLI")
 
     # requied arg
     parser.add_argument('sample', nargs='?')
