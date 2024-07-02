@@ -318,17 +318,17 @@ class Console:
         max_y, max_x = self.y, self.x
         line = []
         # setup screen for display world on cli
-        screens = ['┌' + ('─' * (max_x * 2)) + '┐\n']
+        screens = ['┌' + ('─' * (max_x * 2 + 1)) + '┐\n']
         for y in range(max_y):
             cells = ''
             for x in range(max_x):
                 cells += marks[world[y][x]]
-            line += ['│' + cells + '│']
+            line += ['│ ' + cells + '│']
         for i in range(self.print_cnt):
             start = i * self.max_col
             end = (i + 1) * self.max_col
             screens += ['\n'.join(line[start:end]) + '\n']
-        screens += ['└' + ('─' * (max_x * 2)) + '┘\n']
+        screens += ['└' + ('─' * (max_x * 2 + 1)) + '┘\n']
         return screens
 
     @profile
@@ -339,7 +339,7 @@ class Console:
         max_color = len(color_list)
         line = []
         # setup screen for display world on cli
-        screens = ['┌' + ('─' * (max_x * 2)) + '┐\n']
+        screens = ['┌' + ('─' * (max_x * 2 + 1)) + '┐\n']
         for y in range(max_y):
             cells, pre_color = '', 0
             world_y = world[y]
@@ -361,14 +361,14 @@ class Console:
                             cells[x] = mark
                     pre_color = color
             if pre_color:
-                line += ['│' + ''.join(cells) + color_list[0] + '│']
+                line += ['│ ' + ''.join(cells) + color_list[0] + '│']
             else:
-                line += ['│' + ''.join(cells) + '│']
+                line += ['│ ' + ''.join(cells) + '│']
         for i in range(self.print_cnt):
             start = i * self.max_col
             end = (i + 1) * self.max_col
             screens += ['\n'.join(line[start:end]) + '\n']
-        screens += ['└' + ('─' * (max_x * 2)) + '┘\n']
+        screens += ['└' + ('─' * (max_x * 2 + 1)) + '┘\n']
         return screens
 
     def _get_step(self, step):
