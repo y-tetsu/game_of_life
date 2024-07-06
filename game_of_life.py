@@ -95,16 +95,16 @@ class GameOfLife:
     def start(self):
         try:
             self.console.setup()
+            self.console.display(self.world, self.step, self.colors)
+            time.sleep(self.delay)
             while True:
-                self.console.display(self.world, self.step, self.colors)
                 if self.step == self.max_step:
                     if not self.loop:
                         # if loop option is enabled, game_of_life is never end.
                         break
-                if self.step == 1:
-                    time.sleep(self.delay)
                 self._update()
                 self._wait()
+                self.console.update(self.world, self.step, self.colors)
         except KeyboardInterrupt:
             return
         finally:
@@ -275,10 +275,14 @@ class Console:
         self._cursor_show()
 
     def display(self, world, step, colors):
-        cursor_up = ''
-        if step > 1:
-            cursor_up = self._cursor_up(self.y + 4)
+        screens = self._get_world(world, colors)
+        screens[0] = self._get_title() + screens[0]
+        screens[-1] = screens[-1] + self._get_step(step)
+        for screen in screens:
+            print(screen, end='')
 
+    def update(self, world, step, colors):
+        cursor_up = self._cursor_up(self.y + 4)
         screens = self._get_world(world, colors)
         screens[0] = cursor_up + self._get_title() + screens[0]
         screens[-1] = screens[-1] + self._get_step(step)
