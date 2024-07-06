@@ -353,7 +353,7 @@ class Console:
             cells = ['　'] * max_x
             for x, cell in enumerate(world_y):
                 if cell:
-                    mark = marks[cell]
+                    mark = marks[cell + 1]
                     # change color if it is different from previous
                     if color := colors_y[x] % max_color:
                         if color == pre_color:
