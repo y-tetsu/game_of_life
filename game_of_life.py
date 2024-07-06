@@ -72,7 +72,7 @@ class GameOfLife:
 
         self.alives = [('　', 0), (self.alive, 10), ('□', 30), ('・', 60)]
         self.lifespans = [alive[1] for alive in self.alives]
-        self.marks = [alive[0] for alive in self.alives]
+        self.marks = [''] + [alive[0] for alive in self.alives]
 
         color_type = None
         if color:
@@ -104,7 +104,7 @@ class GameOfLife:
                         break
                 self._update()
                 self._wait()
-                self.console.update(self.world, self.step, self.colors)
+                self.console.update(self.diff_world, self.step, self.colors)
         except KeyboardInterrupt:
             return
         finally:
@@ -140,7 +140,6 @@ class GameOfLife:
         except FileNotFoundError:
             pass
 
-    @profile
     def _update(self):
         # get previous
         pre_world = np.copy(self.world)
@@ -187,6 +186,10 @@ class GameOfLife:
             max_lifespan = self.lifespans[-1]
             self.world[np.where(self.ages >= max_lifespan)] = 0
             self.ages[np.where(self.world == 0)] = 0
+
+        # erase same cells
+        self.diff_world = self.world + ones
+        self.diff_world[np.where(self.world == pre_world)] = 0
 
         self.step += 1
 
@@ -257,9 +260,11 @@ class Console:
             ]
         self.title = self._setup_title()
 
-        self._get_world = self._get_uncolorized_world
+        self._get_world = self._get_world_mono
+        self.update = self._update_mono
         if color_type is not None:
-            self._get_world = self._get_colorized_world
+            self._get_world = self._get_world_color
+            self.update = self._update_color
             self.max_col = 18 if self.x * self.y > 3000 else 50
             if y < self.max_col:
                 self.max_col = y
@@ -281,14 +286,6 @@ class Console:
         for screen in screens:
             print(screen, end='')
 
-    def update(self, world, step, colors):
-        cursor_up = self._cursor_up(self.y + 4)
-        screens = self._get_world(world, colors)
-        screens[0] = cursor_up + self._get_title() + screens[0]
-        screens[-1] = screens[-1] + self._get_step(step)
-        for screen in screens:
-            print(screen, end='')
-
     def _enable_win_escape_code(self):
         kernel = windll.kernel32
         kernel.SetConsoleMode(kernel.GetStdHandle(-11), 7)
@@ -302,13 +299,19 @@ class Console:
     def _cursor_show(self):
         print('\033[?25h', end='')
 
-    def _cursor_up(self, n):
-        return f'\033[{n}A'
+    def _cursor_forward(self, n):
+        return f'\033[{n}C'
+
+    def _cursor_next_line(self, n):
+        return f'\033[{n}E'
+
+    def _cursor_previous_line(self, n):
+        return f'\033[{n}F'
 
     def _setup_title(self):
         name, x, y = self.name, self.x, self.y
         count = x * y
-        max_cell_size = 6552
+        max_cell_size = 22500  # 150x150
         title = f'{name} ({x} x {y})'
         if count > max_cell_size:
             title += f' * warning : max_cell_size({max_cell_size}) is over! *'
@@ -317,7 +320,7 @@ class Console:
     def _get_title(self):
         return f"{self.title}\n"
 
-    def _get_uncolorized_world(self, world, _):
+    def _get_world_mono(self, world, _):
         marks = self.marks
         max_y, max_x = self.y, self.x
         line = []
@@ -326,7 +329,7 @@ class Console:
         for y in range(max_y):
             cells = ''
             for x in range(max_x):
-                cells += marks[world[y][x]]
+                cells += marks[world[y][x] + 1]
             line += ['│ ' + cells + '│']
         for i in range(self.print_cnt):
             start = i * self.max_col
@@ -335,8 +338,7 @@ class Console:
         screens += ['└' + ('─' * (max_x * 2 + 1)) + '┘\n']
         return screens
 
-    @profile
-    def _get_colorized_world(self, world, colors):
+    def _get_world_color(self, world, colors):
         color_list = self.color_list
         marks = self.marks
         max_y, max_x = self.y, self.x
@@ -374,6 +376,70 @@ class Console:
             screens += ['\n'.join(line[start:end]) + '\n']
         screens += ['└' + ('─' * (max_x * 2 + 1)) + '┘\n']
         return screens
+
+    def _update_mono(self, diff_world, step, _):
+        marks, max_y = self.marks, self.y
+        line, screens = [], []
+        for y in range(max_y):
+            cells = self._cursor_next_line(1)
+            last_x = -2
+            diff_world_y = diff_world[y]
+            for x, cell in enumerate(diff_world_y):
+                if cell:
+                    forward = (x - last_x - 1) * 2
+                    if forward:
+                        cells += self._cursor_forward(forward)
+                    cells += marks[cell]
+                    last_x = x
+            if cells:
+                line += [cells]
+
+        for i in range(self.print_cnt):
+            start = i * self.max_col
+            end = (i + 1) * self.max_col
+            screens += [''.join(line[start:end])]
+
+        screens[0] = self._cursor_previous_line(max_y + 3) + screens[0]
+        screens[-1] += self._cursor_next_line(2)
+        screens[-1] += self._get_step(step)
+
+        for screen in screens:
+            print(screen, end='')
+
+    @profile
+    def _update_color(self, diff_world, step, colors):
+        marks = self.marks
+        color_list = self.color_list
+        max_color = len(color_list)
+        max_y = self.y
+        line, screens = [], []
+        colors %= max_color
+        for y in range(max_y):
+            cells = self._cursor_next_line(1)
+            last_x = -2
+            diff_world_y = diff_world[y]
+            colors_y = colors[y]
+            for x, cell in enumerate(diff_world_y):
+                if cell:
+                    forward = (x - last_x - 1) * 2
+                    if forward:
+                        cells += self._cursor_forward(forward)
+                    cells += color_list[colors_y[x]] + marks[cell]
+                    last_x = x
+            if cells:
+                line += [cells + color_list[0]]
+
+        for i in range(self.print_cnt):
+            start = i * self.max_col
+            end = (i + 1) * self.max_col
+            screens += [''.join(line[start:end])]
+
+        screens[0] = self._cursor_previous_line(max_y + 3) + screens[0]
+        screens[-1] += self._cursor_next_line(2)
+        screens[-1] += self._get_step(step)
+
+        for screen in screens:
+            print(screen, end='')
 
     def _get_step(self, step):
         return f'step = {step}\n'
