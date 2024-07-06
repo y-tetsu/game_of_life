@@ -413,7 +413,6 @@ class Console:
         max_color = len(color_list)
         max_y = self.y
         line, screens = [], []
-        colors %= max_color
         for y in range(max_y):
             cells = self._cursor_next_line(1)
             last_x = -2
@@ -424,7 +423,7 @@ class Console:
                     forward = (x - last_x - 1) * 2
                     if forward:
                         cells += self._cursor_forward(forward)
-                    cells += color_list[colors_y[x]] + marks[cell]
+                    cells += color_list[colors_y[x] % max_color] + marks[cell]
                     last_x = x
             line += [cells + color_list[0]]
 
