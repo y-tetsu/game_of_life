@@ -426,8 +426,7 @@ class Console:
                         cells += self._cursor_forward(forward)
                     cells += color_list[colors_y[x]] + marks[cell]
                     last_x = x
-            if cells:
-                line += [cells + color_list[0]]
+            line += [cells + color_list[0]]
 
         for i in range(self.print_cnt):
             start = i * self.max_col
