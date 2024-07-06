@@ -76,7 +76,7 @@ class GameOfLife:
 
         color_type = None
         if color:
-            color_type = 'normal'
+            color_type = 'vitamin'
         elif color2:
             color_type = 'pastel'
         self.console = Console(self.x, self.y, self.name,
@@ -232,18 +232,18 @@ class Console:
         self.marks = marks
         if 'win' in system().lower():
             self._enable_win_escape_code()
-        if color_type == 'normal':
+        if color_type == 'vitamin':
             self.color_list = [
                 '\033[39m',                # 0: default
                 '\033[38;2;255;255;255m',  # 1: white
-                '\033[38;2;0;153;68m',     # 2: green
-                '\033[38;2;230;0;18m',     # 3: red
-                '\033[38;2;235;202;27m',   # 4: yellow
-                '\033[38;2;145;0;0m',      # 5: brown
-                '\033[38;2;0;160;233m',    # 6: cyan
-                '\033[38;2;241;158;194m',  # 7: pink
-                '\033[38;2;240;131;0m',    # 8: orange
-                '\033[38;2;146;7;131m',    # 9: purple
+                '\033[38;2;0;170;85m',     # 2: green
+                '\033[38;2;238;0;68m',     # 3: red
+                '\033[38;2;255;238;85m',   # 4: yellow
+                '\033[38;2;85;00;00m',     # 5: brown
+                '\033[38;2;0;170;238m',    # 6: cyan
+                '\033[38;2;255;221;221m',  # 7: pink
+                '\033[38;2;255;170;51m',   # 8: orange
+                '\033[38;2;136;0;119m',    # 9: purple
             ]
         elif color_type == 'pastel':
             self.color_list = [
