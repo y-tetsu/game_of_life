@@ -23,7 +23,7 @@ class GameOfLife:
     def __init__(self, sample=None, name='game_of_life', x=30, y=15,
                  world=None, max_step=None, wait=0.03, delay=0.0,
                  alive='■', ratio=0.5, loop=False, torus=False, mortal=False,
-                 color=False, color2=False, json_file=None):
+                 color=False, color2=False, color3=False, json_file=None):
         self.sample = sample
         self.name = name
         samples, colors = self._load_samples('samples.json'), None
@@ -60,6 +60,7 @@ class GameOfLife:
         self.mortal = mortal
         self.color = color
         self.color2 = color2
+        self.color3 = color3
 
         if json_file is not None:
             rand = False
@@ -79,6 +80,8 @@ class GameOfLife:
             color_type = 'vitamin'
         elif color2:
             color_type = 'pastel'
+        elif color3:
+            color_type = 'thermography'
         self.console = Console(self.x, self.y, self.name,
                                self.marks, color_type)
 
@@ -137,6 +140,7 @@ class GameOfLife:
                 self.mortal = settings['mortal']
                 self.color = settings['color']
                 self.color2 = settings['color2']
+                self.color3 = settings['color3']
         except FileNotFoundError:
             pass
 
@@ -214,6 +218,7 @@ class GameOfLife:
             'mortal': self.mortal,
             'color': self.color,
             'color2': self.color2,
+            'color3': self.color3,
         }
         with open(json_file, 'w') as f:
             output = pprint.pformat(settings, indent=4,
@@ -257,6 +262,21 @@ class Console:
                 '\033[38;2;255;168;255m',  # 7: pink
                 '\033[38;2;255;211;168m',  # 8: orange
                 '\033[38;2;211;168;255m',  # 9: purple
+            ]
+        elif color_type == 'thermography':
+            self.color_list = [
+                '\033[38;2;254;252;238m',  # 1:
+                '\033[38;2;255;240;130m',  # 2:
+                '\033[38;2;254;199;2m',    # 3:
+                '\033[38;2;244;105;2m',    # 4:
+                '\033[38;2;223;47;75m',    # 5:
+                '\033[38;2;223;47;75m',    # 5:
+                '\033[38;2;178;1;148m',    # 6:
+                '\033[38;2;178;1;148m',    # 6:
+                '\033[38;2;105;1;158m',    # 7:
+                '\033[38;2;105;1;158m',    # 7:
+                '\033[38;2;16;1;121m',     # 8:
+                '\033[38;2;16;1;121m',     # 8:
             ]
         self.title = self._setup_title()
 
@@ -440,7 +460,7 @@ class Console:
             print(screen, end='')
 
     def _get_step(self, step):
-        return f'step = {step}\n'
+        return '\033[39m' + f'step = {step}\n'
 
 
 if __name__ == '__main__':
@@ -465,7 +485,7 @@ if __name__ == '__main__':
     # optional flag
     options = (
         ('-l', '--loop'), ('-t', '--torus'), ('-m', '--mortal'),
-        ('-c', '--color'), ('-c2', '--color2'))
+        ('-c', '--color'), ('-c2', '--color2'), ('-c3', '--color3'))
     for option in options:
         parser.add_argument(*option, action="store_true")
     args = parser.parse_args()
@@ -485,7 +505,8 @@ if __name__ == '__main__':
     # set args
     options = (
         ('loop', args.loop), ('torus', args.torus), ('mortal', args.mortal),
-        ('color', args.color), ('color2', args.color2))
+        ('color', args.color), ('color2', args.color2),
+        ('color3', args.color3))
     for key, value in options:
         setting[key] = value
 
