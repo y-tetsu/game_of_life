@@ -24,7 +24,8 @@ class GameOfLife:
                  world=None, max_step=None, wait=0.03, delay=0.0,
                  alive='■', ratio=0.5, loop=False, torus=False, mortal=False,
                  rand=False,
-                 color=False, color2=False, color3=False, json_file=None):
+                 color=False, color2=False, color3=False, color4=False,
+                 json_file=None):
         self.sample = sample
         self.name = name
         samples, colors = self._load_samples('samples.json'), None
@@ -63,6 +64,7 @@ class GameOfLife:
         self.color = color
         self.color2 = color2
         self.color3 = color3
+        self.color4 = color4
 
         if json_file is not None:
             random_cells = False
@@ -84,6 +86,21 @@ class GameOfLife:
             color_type = 'pastel'
         elif color3:
             color_type = 'thermography'
+        elif color4:
+            color_type = 'matrix'
+            a = self.alive
+            self.alives = [
+                ('　', 0),
+                (a, 1), (a, 2), (a, 3), (a, 4), (a, 5),
+                (a, 6), (a, 7), (a, 8), (a, 9), (a, 10),
+                (a, 11), (a, 12), (a, 13), (a, 14), (a, 15),
+                (a, 16), (a, 17), (a, 18), (a, 19), (a, 20),
+                ('≠', 21), ('＜', 22), ('ｅ', 23), ('＋', 24),
+                ('”', 25), ('Ｚ', 26), ('ハ', 27), ('８', 28),
+                ('Ｉ', 29), ('０', 30),
+            ]
+            self.lifespans = [alive[1] for alive in self.alives]
+            self.marks = [''] + [alive[0] for alive in self.alives]
         self.console = Console(self.x, self.y, self.name,
                                self.marks, color_type, self.random)
 
@@ -144,6 +161,7 @@ class GameOfLife:
                 self.color = settings['color']
                 self.color2 = settings['color2']
                 self.color3 = settings['color3']
+                self.color4 = settings['color4']
         except FileNotFoundError:
             pass
 
@@ -223,6 +241,7 @@ class GameOfLife:
             'color': self.color,
             'color2': self.color2,
             'color3': self.color3,
+            'color4': self.color4,
         }
         with open(json_file, 'w') as f:
             output = pprint.pformat(settings, indent=4,
@@ -282,6 +301,23 @@ class Console:
                 '\033[38;2;105;1;158m',    # 7:
                 '\033[38;2;16;1;121m',     # 8:
                 '\033[38;2;16;1;121m',     # 8:
+            ]
+        elif color_type == 'matrix':
+            self.color_list = [
+                '\033[39m',                # 0: default
+                '\033[38;2;200;255;210m',  # 1: green1
+                '\033[38;2;170;242;186m',  # 2: green2
+                '\033[38;2;137;198;150m',  # 3: green3
+                '\033[38;2;137;198;150m',  # 3: green3
+                '\033[38;2;137;198;150m',  # 3: green3
+                '\033[38;2;92;169;108m',   # 4: green4
+                '\033[38;2;92;169;108m',   # 4: green4
+                '\033[38;2;92;169;108m',   # 4: green4
+                '\033[38;2;92;169;108m',   # 4: green4
+                '\033[38;2;92;169;108m',   # 4: green4
+                '\033[38;2;58;109;68m',    # 5: green5
+                '\033[38;2;58;109;68m',    # 5: green5
+                '\033[38;2;5;45;5m',       # 6: green6
             ]
         self.title = self._setup_title()
 
@@ -499,7 +535,8 @@ if __name__ == '__main__':
     options = (
         ('-l', '--loop'), ('-t', '--torus'), ('-m', '--mortal'),
         ('-rand', '--random'),
-        ('-c', '--color'), ('-c2', '--color2'), ('-c3', '--color3'))
+        ('-c', '--color'), ('-c2', '--color2'), ('-c3', '--color3'),
+        ('-c4', '--color4'))
     for option in options:
         parser.add_argument(*option, action="store_true")
     args = parser.parse_args()
@@ -521,7 +558,7 @@ if __name__ == '__main__':
         ('loop', args.loop), ('torus', args.torus), ('mortal', args.mortal),
         ('rand', args.random),
         ('color', args.color), ('color2', args.color2),
-        ('color3', args.color3))
+        ('color3', args.color3), ('color4', args.color4))
     for key, value in options:
         setting[key] = value
 
