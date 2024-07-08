@@ -1,7 +1,7 @@
 import time
 from platform import system
 from ctypes import windll
-from random import random
+from random import random, randrange
 from datetime import datetime
 import json
 import pprint
@@ -23,6 +23,7 @@ class GameOfLife:
     def __init__(self, sample=None, name='game_of_life', x=30, y=15,
                  world=None, max_step=None, wait=0.03, delay=0.0,
                  alive='■', ratio=0.5, loop=False, torus=False, mortal=False,
+                 rand=False,
                  color=False, color2=False, color3=False, json_file=None):
         self.sample = sample
         self.name = name
@@ -40,12 +41,12 @@ class GameOfLife:
                 wait = samples[sample]['wait']
 
         self.x, self.y = x, y
-        rand = False
+        random_cells = False
         if world is not None:
             self.x, self.y = len(world[0]), len(world)
             self.world = [[x for x in row] for row in world]
         else:
-            rand = True
+            random_cells = True
             self.world = [
                 [random() < ratio for _ in range(x)] for _ in range(y)
             ]
@@ -58,12 +59,13 @@ class GameOfLife:
         self.loop = loop
         self.torus = torus
         self.mortal = mortal
+        self.random = rand
         self.color = color
         self.color2 = color2
         self.color3 = color3
 
         if json_file is not None:
-            rand = False
+            random_cells = False
             self._load(json_file)
 
         self.step = 1
@@ -83,9 +85,9 @@ class GameOfLife:
         elif color3:
             color_type = 'thermography'
         self.console = Console(self.x, self.y, self.name,
-                               self.marks, color_type)
+                               self.marks, color_type, self.random)
 
-        if rand:
+        if random_cells:
             self._dump()
 
         # numpy & open-cv
@@ -138,6 +140,7 @@ class GameOfLife:
                 self.loop = settings['loop']
                 self.torus = settings['torus']
                 self.mortal = settings['mortal']
+                self.random = settings['random']
                 self.color = settings['color']
                 self.color2 = settings['color2']
                 self.color3 = settings['color3']
@@ -216,6 +219,7 @@ class GameOfLife:
             'loop': self.loop,
             'torus': self.torus,
             'mortal': self.mortal,
+            'random': self.random,
             'color': self.color,
             'color2': self.color2,
             'color3': self.color3,
@@ -230,11 +234,12 @@ class GameOfLife:
 
 
 class Console:
-    def __init__(self, x, y, name, marks, color_type):
+    def __init__(self, x, y, name, marks, color_type, random):
         self.x = x
         self.y = y
         self.name = name
         self.marks = marks
+        self.random = random
         if 'win' in system().lower():
             self._enable_win_escape_code()
         if color_type == 'vitamin':
@@ -409,7 +414,11 @@ class Console:
                     forward = (x - last_x - 1) * 2
                     if forward:
                         cells += self._cursor_forward(forward)
-                    cells += marks[cell]
+                    mark = marks[cell]
+                    if self.random:
+                        if cell > 1:
+                            mark = marks[randrange(1, len(marks))]
+                    cells += mark
                     last_x = x
             if cells:
                 line += [cells]
@@ -443,7 +452,11 @@ class Console:
                     forward = (x - last_x - 1) * 2
                     if forward:
                         cells += self._cursor_forward(forward)
-                    cells += color_list[colors_y[x] % max_color] + marks[cell]
+                    mark = marks[cell]
+                    if self.random:
+                        if cell > 1:
+                            mark = marks[randrange(1, len(marks))]
+                    cells += color_list[colors_y[x] % max_color] + mark
                     last_x = x
             line += [cells + color_list[0]]
 
@@ -485,6 +498,7 @@ if __name__ == '__main__':
     # optional flag
     options = (
         ('-l', '--loop'), ('-t', '--torus'), ('-m', '--mortal'),
+        ('-rand', '--random'),
         ('-c', '--color'), ('-c2', '--color2'), ('-c3', '--color3'))
     for option in options:
         parser.add_argument(*option, action="store_true")
@@ -505,6 +519,7 @@ if __name__ == '__main__':
     # set args
     options = (
         ('loop', args.loop), ('torus', args.torus), ('mortal', args.mortal),
+        ('rand', args.random),
         ('color', args.color), ('color2', args.color2),
         ('color3', args.color3))
     for key, value in options:
