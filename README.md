@@ -11,6 +11,9 @@ https://qiita.com/y-tetsu/items/2db7ce8dd2f8884c2028
 ### Pythonで作ったコンソール上で動くライフゲーム#3
 https://qiita.com/y-tetsu/items/b845f494ffd19450015e
 
+### ライフゲームでマトリックスっぽいことやってみたい！
+https://qiita.com/y-tetsu/items/cb8543235b48267df803
+
 ## インストール
 ```
 pip install numpy
